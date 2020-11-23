@@ -1,0 +1,73 @@
+{% load static %}
+
+<nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand logo" href="/">
+                <img src="{% static 'members/img/logo.png' %}" width="166" height="84">
+            </a>
+        </div>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div id="navbarNav" >
+
+                <div class="navbarNav-item"><a class="nav-link" href="/members">Members</a></div>
+                {% if user.is_authenticated %}
+                <div class="navbarNav-item"><a class="nav-link" href="/logout">Logout</a></div>
+                <div class="navbarNav-item"><a class="nav-link" href="/my_profile"><img src="{%static 'members/img/account.png' %}" height="30" width="30"></a></div>
+                {% else %}
+                <div class="navbarNav-item"><a class="nav-link" href="/login_page">Login</a></div>
+                {% endif %}
+        </div>
+    </div>
+</nav>
+
+<style>
+    .logo {
+        margin-top: -15px;
+    }
+
+    .navbar {
+        margin: 0px;
+        height: 70px;
+        width: 100%;
+        display: block;
+        background-color: #398677;
+    }
+
+    .ul {
+        display: flex;
+        list-style: none;
+    }
+
+    .nav {
+        width: 25%;
+    }
+
+    #navbarNav {
+        display: flex;
+        width: 25%;
+        margin-top: -20px; 
+    }
+
+    .navbarNav-item>a {
+        color: white;
+        text-decoration: none;
+    }
+
+    a:hover{
+        color: #ed7739;
+        text-decoration: none;
+    }
+
+    .navbar .navbar-nav {
+        float: right;
+        margin: 5px;
+    }
+
+    #nav-list {
+        display: flex;
+    }
+
+</style>

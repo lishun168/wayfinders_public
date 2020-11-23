@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+
+<div class="section">
+<form method="post" action="login/"> {% csrf_token %}
+  {{form.as_p}}
+
+  <input type="submit" name="submit" value="Login">
+</form>
+</div>
+
+{% endblock %}
+
+{% block head %}
+    {{ block.super }}
+
+    <title>
+        Wayfinders {% block title %}{% endblock %}
+    </title>
+
+    {# favicon #}
+    <link href="#" rel="icon" type="image/x-icon" />
+
+    <style>
+
+        .section {
+            padding-top: 25px;
+            padding-bottom: 25px;
+            padding-left: 10%;
+            padding-right: 10%;
+            overflow: hidden;
+        }
+
+    </style>
+{% endblock %}
