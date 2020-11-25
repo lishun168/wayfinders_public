@@ -4,13 +4,16 @@
 
 {% block content %}
 
-{% for profile in member %}
 <div class="section">
     <div class="title_wrapper">
         <div class="title_bar">
             <h3>{{profile.first_name}} {{profile.last_name}} - {{profile.job_title}}</h3>
         </div>
+        {% if my_profile == True %}
+        <div class="inline"><a href="/edit_profile/{{profile.pk}}" > <img src="{%static 'members/img/edit.png' %}" height="30" width="30"> </a></div>
+        {% endif %}
     </div>
+   
     <div class="profile_picture">
         <img src="/static/members/profile_pic/MC-0036.JPG" width="400" height="650">
     </div>
@@ -51,8 +54,6 @@
     </div>
 </div>
 
-
-{% endfor %}
 
 {% endblock %}
 
@@ -101,6 +102,10 @@
 
         .profile_section {
             margin-bottom: 25px;
+        }
+
+        .inline {
+            display:inline;
         }
 
     </style>

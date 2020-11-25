@@ -15,8 +15,9 @@
 
     {% for member in members %}
         <a href="/profile/{{member.pk}}"> <div> {{member.last_name }}, {{member.first_name}}  - {{member.job_title}}</div></a>
-</div>
+
 {% endfor %}
+</div>
 
 {% endblock %}
 

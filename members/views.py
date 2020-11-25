@@ -1,6 +1,10 @@
 from django.shortcuts import render
 from django.db.models import Q
 from django.views import View
+from . import forms as my_forms
+from django.urls import reverse
+from django.views.generic.edit import FormView
+from django.views.generic.edit import UpdateView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib import auth
 from django.contrib.auth.views import LoginView
@@ -38,21 +42,39 @@ class Member(View):
     template_name = 'members/profile.html'
 
     def get(self, request, pk):
-        member = MemberModel.objects.filter(pk=pk)
+        my_profile = False
+        member = MemberModel.objects.get(pk=pk)
         memberskills = MemberSkills.objects.filter(member=pk)
         membercompanies = MemberCompany.objects.filter(member=pk)
         skills = Skill.objects.all()
         permissions = Permissions.objects.all()
+        mId = request.user.pk
+        user_member = MemberModel.objects.get(user=mId)
+        logger.error(member.pk)
+        logger.error(user_member.pk)
+        if(user_member.pk == member.pk):
+            logger.error("Is user profile")
+            my_profile = True
 
         context = {
-            'member': member,
+            'profile': member,
             'member_skills': memberskills,
             'member_companies': membercompanies,
             'skills': skills,
-            'permissions': permissions
+            'permissions': permissions,
+            'my_profile': my_profile
         }
         logger.error(context)
         return render(request, self.template_name, context)
+
+class EditMember(UpdateView):
+    template_name = 'members/edit_profile.html'
+    model = MemberModel
+    fields = '__all__'
+
+    def get_success_url(self):
+        return reverse('')
+    
 
 class MembersDirectory(View):
     template_name = 'members/members_directory.html'
@@ -64,6 +86,7 @@ class MembersDirectory(View):
         }
         logger.error(context)
         return render(request, self.template_name, context)
+        
 
 class DirectorySearch(View):
     template_name='members/members_directory.html'

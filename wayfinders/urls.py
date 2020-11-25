@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from members.views import Index, Member, Company, MembersDirectory, DirectorySearch, LoginPage, MyProfile
+from members.views import Index, Member, Company, MembersDirectory, DirectorySearch, LoginPage, MyProfile, EditMember
 from members import views as member_views
 
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
@@ -30,7 +30,8 @@ urlpatterns = [
     path('login/', member_views.login_view),
     path('logout/', member_views.logout_view),
     path('search/<str:query>', DirectorySearch.as_view()),
-    path('my_profile/', MyProfile.as_view())
+    path('my_profile/', MyProfile.as_view()),
+    path('edit_profile/<int:pk>', EditMember.as_view())
 ]
 
 urlpatterns += staticfiles_urlpatterns()
