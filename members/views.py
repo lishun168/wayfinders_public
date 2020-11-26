@@ -1,11 +1,12 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.db.models import Q
 from django.views import View
 from . import forms as my_forms
 from django.urls import reverse
 from django.views.generic.edit import FormView
-from django.views.generic.edit import UpdateView
+from django.views.generic.edit import UpdateView, CreateView
 from django.contrib.messages.views import SuccessMessageMixin
+from django.contrib.auth.forms import UserCreationForm
 from django.contrib import auth
 from django.contrib.auth.views import LoginView
 from django.http import HttpResponseRedirect
@@ -71,10 +72,13 @@ class EditMember(UpdateView):
     template_name = 'members/edit_profile.html'
     model = MemberModel
     fields = '__all__'
-
-    def get_success_url(self):
-        return reverse('')
+    success_url = "/"
     
+class CreateMember(CreateView):
+    template_name = 'members/create_profile.html'
+    model = MemberModel
+    fields = '__all__'
+    success_url = "/"
 
 class MembersDirectory(View):
     template_name = 'members/members_directory.html'
@@ -124,3 +128,21 @@ def login_view(request):
 def logout_view(request):
     auth.logout(request)
     return HttpResponseRedirect("/")
+
+def signup(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data.get('username')
+            raw_password = form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=raw_password)
+            login(request, user)
+            return redirect("/")
+
+    if request.method == 'GET':
+        form = UserCreationForm()
+        return(request, 'signup.html', {'form': form})
+    return(request, 'signup.html', {'form': form})
+
+
