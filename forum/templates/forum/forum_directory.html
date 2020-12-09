@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+<div class="body-content">
+    <h1>Wayfinders Forums</h1>
+
+    {% for thread in threads %}
+        <a href="/forum/{{thread.pk}}"> 
+            <div class="thread">
+                <div class="thread_title"> {{thread.title }}</div>
+                <div class="thread_subtitle"> {{thread.subtitle}} </div>
+            </div>
+        </a>
+
+    {% endfor %}
+</div>
+
+{% endblock %}
+
+{% block head %}
+    {{ block.super }}
+    <style>
+        
+        .thread {
+            background: #cccccc;
+            padding: 15px;
+            text-decoration: none;
+            color: #121212;
+            box-shadow: -2px 5px 5px #888888;
+            margin-bottom: 15px;
+        }
+
+        .thread:hover {
+            box-shadow: -4px 7px 10px #888888;
+        }
+
+        .thread_title {
+
+        }
+
+        .thread_subtitle {
+            font-size: 10pt;
+        }
+
+    </style>
+    <script>
+        $(document).ready( function() {
+            $("#search-button").click( function(event) {
+                var str = $('#search_query').val();
+                var search_url = "http://127.0.0.1:8000/search/" + str;
+                window.location.replace(search_url);
+            });
+        });
+    </script>
+
+{% endblock %}

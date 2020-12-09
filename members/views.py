@@ -49,13 +49,12 @@ class Member(View):
         membercompanies = MemberCompany.objects.filter(member=pk)
         skills = Skill.objects.all()
         permissions = Permissions.objects.all()
-        mId = request.user.pk
-        user_member = MemberModel.objects.get(user=mId)
-        logger.error(member.pk)
-        logger.error(user_member.pk)
-        if(user_member.pk == member.pk):
-            logger.error("Is user profile")
-            my_profile = True
+
+        if request.user is not None:
+            mId = request.user.pk
+            user_member = MemberModel.objects.get(user=mId)
+            if(user_member.pk == member.pk):
+                my_profile = True
 
         context = {
             'profile': member,
@@ -65,7 +64,6 @@ class Member(View):
             'permissions': permissions,
             'my_profile': my_profile
         }
-        logger.error(context)
         return render(request, self.template_name, context)
 
 class EditMember(UpdateView):
@@ -88,7 +86,7 @@ class MembersDirectory(View):
         context = {
             'members': members
         }
-        logger.error(context)
+        
         return render(request, self.template_name, context)
         
 

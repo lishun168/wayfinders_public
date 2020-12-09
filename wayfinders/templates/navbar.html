@@ -13,6 +13,7 @@
         <div id="navbarNav" >
 
                 <div class="navbarNav-item"><a class="nav-link" href="/members">Members</a></div>
+                <div class="navbarNav-item"><a class="nav-link" href="/forum">Forums</a></div>
                 {% if user.is_authenticated %}
                 <div class="navbarNav-item"><a class="nav-link" href="/logout">Logout</a></div>
                 <div class="navbarNav-item"><a class="nav-link" href="/my_profile"><img src="{%static 'members/img/account.png' %}" height="30" width="30"></a></div>
@@ -48,7 +49,7 @@
 
     #navbarNav {
         display: flex;
-        width: 25%;
+        width: 33%;
         margin-top: -20px; 
     }
 

@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+<div class="body-content">
+    <h1>{{thread.title}}</h1>
+    <h5>{{thread.subtitle}}</h5>
+
+
+    <div class="discussion">
+        {% for post in posts %}
+            
+            <div class="post">
+                <div class="post_body"> {{post.body}}</div>
+                <div class="post_footer">
+                    <div class="post_created_by">{{post.created_by}}</div><div> {{post.created_at}} </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div>Add a Post</div>
+                <textarea class="create_post_text"></textarea>
+                <div class="button_container">
+                    <button type="button" class="btn btn-primary post-button">Create Post</button>
+                </div>
+            </div>
+            
+
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}
+
+{% block head %}
+    {{ block.super }}
+    <style>
+
+        .discussion {
+            margin-top: 25px;
+        }
+        
+        .post {
+            background: #cccccc;
+            padding: 15px;
+            text-decoration: none;
+            color: #121212;
+            box-shadow: -1px 2px 3px #888888;
+            margin-bottom: 15px;
+        }
+
+        .post-button {
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .post_footer {
+            display: flex;
+            align-items: flex-end;
+            font-size: 10pt;
+            margin-top: 15px;
+        }
+
+        .post_created_by {
+            margin-right: 15px;
+        }
+
+        .section {
+            width:100%;
+            display: flex;
+            align-items: flex-start;
+            flex-direction: column;
+            margin-top: 25px;
+        }
+
+        .button_container {
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+
+        .create_post_text {
+            width: 100%;
+            min-height: 200px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+    </style>
+    <script>
+        $(document).ready( function() {
+            $("#search-button").click( function(event) {
+                var str = $('#search_query').val();
+                var search_url = "http://127.0.0.1:8000/search/" + str;
+                window.location.replace(search_url);
+            });
+        });
+    </script>
+
+{% endblock %}

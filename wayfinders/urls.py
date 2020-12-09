@@ -17,6 +17,7 @@ from django.contrib import admin
 from django.urls import path
 from members.views import Index, Member, Company, MembersDirectory, DirectorySearch, LoginPage, MyProfile, EditMember, CreateMember
 from members import views as member_views
+from forum.views import ForumDirectory, ThreadPage
 
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
@@ -33,7 +34,9 @@ urlpatterns = [
     path('my_profile/', MyProfile.as_view()),
     path('edit_profile/<int:pk>', EditMember.as_view()),
     path('create_profile/', CreateMember.as_view()),
-    path('signup', member_views.signup, name='signup')
+    path('signup', member_views.signup, name='signup'),
+    path('forum', ForumDirectory.as_view()),
+    path('forum/<int:pk>', ThreadPage.as_view())
 
 ]
 

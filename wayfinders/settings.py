@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'members'
+    'members',
+    'forum'
 ]
 
 MIDDLEWARE = [
@@ -58,7 +59,8 @@ TEMPLATES = [
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
             os.path.join(BASE_DIR, 'wayfinders', 'templates'),
-            os.path.join(BASE_DIR, 'members', 'templates')
+            os.path.join(BASE_DIR, 'members', 'templates'),
+            os.path.join(BASE_DIR, 'forum', 'templates')
         ],
         'APP_DIRS': True,
         'OPTIONS': {
