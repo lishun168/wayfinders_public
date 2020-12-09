@@ -17,7 +17,7 @@ class ThreadPage(View):
     template_name='forum/thread.html'
 
     def get(self, request, pk):
-        posts = Post.objects.filter(pk=pk)
+        posts = Post.objects.filter(thread=pk).order_by('-created_at')
         thread = Thread.objects.get(pk=pk)
 
         context = {
@@ -26,3 +26,5 @@ class ThreadPage(View):
         }
 
         return render(request, self.template_name, context)
+
+

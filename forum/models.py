@@ -23,3 +23,6 @@ class Post(models.Model):
     edited_at = models.DateField(auto_now_add=True, auto_now=False)
     edited = models.BooleanField(default=False)
 
+    def __str__(self):
+        return '%s - %s' % (self.thread, self.created_at )
+
