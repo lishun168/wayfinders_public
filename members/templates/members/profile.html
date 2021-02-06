@@ -11,6 +11,7 @@
         </div>
         {% if my_profile == True %}
         <div class="inline"><a href="/edit_profile/{{profile.pk}}" > <img src="{%static 'members/img/edit.png' %}" height="30" width="30"> </a></div>
+        <div class="inline"><a href="/calendar/{{calendar.pk}}"><img src="{%static 'members/img/calendar.png' %}" height="30" width="30"></a></div>
         {% endif %}
     </div>
    
@@ -27,7 +28,7 @@
         
         <div class="profile_section">
             <div class="subtitle">Website:</div>
-            <div>{{profile.website}}</div>
+            <a href="{{profile.website}}"><div>{{profile.website}}</div></a>
         </div>
         <div class="profile_section">
             <div class="subtitle">Contact:</div>
@@ -39,7 +40,7 @@
         <div class="profile_section">
             <div class="subtitle">Company:</div>
             {% for company in member_companies %}
-            <div>{{company.company}}</div>
+            <a href="/company/{{company.pk}}"><div>{{company.company}}</div></a>
             {% endfor %}
         </div>
         <div class="profile_section">

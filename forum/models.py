@@ -6,7 +6,7 @@ from members.models import Member
 class Thread(models.Model):
     title = models.CharField(max_length=255)
     subtitle = models.CharField(max_length=255)
-    created_at = models.DateField(auto_now_add=True, auto_now=False)
+    created_at = models.DateTimeField(auto_now_add=True, auto_now=False)
     created_by = models.ForeignKey(Member, on_delete=models.SET_NULL, null=True, blank=True)
     created_by_string = models.CharField(max_length=255)
 
@@ -19,10 +19,16 @@ class Post(models.Model):
     body = models.TextField()
     created_by = models.ForeignKey(Member, on_delete=models.SET_NULL, null=True, blank=True)
     created_by_string = models.CharField(max_length=255)
-    created_at = models.DateField(auto_now_add=True, auto_now=False)
-    edited_at = models.DateField(auto_now_add=True, auto_now=False)
+    created_at = models.DateTimeField(auto_now_add=True, auto_now=False)
+    edited_at = models.DateTimeField(auto_now_add=True, auto_now=False)
     edited = models.BooleanField(default=False)
+    likes = models.IntegerField(default=0)
+    flagged = models.BooleanField(default=False)
+    number_of_flags = models.IntegerField(default=0)
 
     def __str__(self):
         return '%s - %s' % (self.thread, self.created_at )
+
+
+
 

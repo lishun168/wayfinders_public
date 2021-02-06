@@ -3,29 +3,12 @@
 {% load static %}
 
 {% block content %}
-
 <div class="section">
-    <div class="title_wrapper">
-        <div class="title_bar">
-            <h3>{{company.name}}</h3>
-        </div>
-        {% if my_profile == True %}
-        <div class="inline"><a href="#" > <img src="{%static 'members/img/edit.png' %}" height="30" width="30"> </a></div>
-        {% endif %}
-    </div>
-   
-    <div class="profile_picture">
-        <img src="/static/members/profile_pic/MC-0036.JPG" width="400" height="650">
-    </div>
-    <div class="profile">
-        <div class="profile_section">
-            <div class="subtitle">About Us:</div>
-            <div>{{company.description}}</div>
-        </div>
-    </div>
+    <form method="post">{% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" value="Create Discussion">
+    </form>
 </div>
-
-
 {% endblock %}
 
 {% block head %}
@@ -73,10 +56,6 @@
 
         .profile_section {
             margin-bottom: 25px;
-        }
-
-        .inline {
-            display:inline;
         }
 
     </style>

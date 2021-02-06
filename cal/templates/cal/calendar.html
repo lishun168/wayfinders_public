@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}     
+
+
+<div class="calendar-page-body">
+    <div class="calendar-header">
+        <div class="calendar-title">
+            <h3>
+            {{calendar.name}} - {{ month }} {{ year }}
+            </h3>
+            <div class="buttons">
+                <div> <a href="/create_event/{{calendar.pk}}"><button>Create Event</button></a></div>
+                <div> <a href="/create_filter/{{calendar.pk}}"><button>Create Filter</button></a></div>
+            </div>  
+        </div>
+        <div>
+            {% for filter in filters %}
+            <label class="container">{{filter.name}}
+                <input type="checkbox" checked="checked">
+                <span class="checkmark"></span>
+              </label>
+            {% endfor %}
+            <div> <a href="/calendar/{{calendar.pk}}"><button>Filter By Calendar</button></a></div>
+        </div>
+        
+        
+    </div>
+    
+    <div class="calendar-subtitle-bar">
+            
+        {{html_calendar}}
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block head %}
+    {{ block.super }}
+
+    <title>
+        Wayfinders {% block title %}{% endblock %}
+    </title>
+
+    {# favicon #}
+    <link href="#" rel="icon" type="image/x-icon" />
+
+    <style>
+
+        .calendar-page-body {
+            padding: 25px;
+        }
+
+        .calendar-section {
+            width: 100%;
+        }
+
+        .calendar-header {
+            margin-bottom: 45px;
+            width: 100%;
+            display: flex;
+            justify-content: space-evenly;
+        }
+
+        .calendar-body {
+            display: flex;
+            width: 100%;
+            flex-wrap: wrap;
+            justify-content: space-evenly;
+        }   
+
+        .header {
+            border-bottom: 1px solid #888;
+        }
+
+        .calendar-body > div {
+            width: 12%;
+            border-right: 1px solid #888;
+        }
+        .calendar-time {
+            text-align: center;
+        }
+
+        .calendar-title {
+            width: 100%;
+        }
+
+        .calendar-subtitle-bar {
+            width: 50%;
+            display: flex;
+            justify-content: space-evenly;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .day {
+            padding: 4px;
+            height: 175px;
+            width: 175px;
+        }
+
+        .month {
+            padding-top: 2px;
+            padding-bottom: 25px;
+            width: 100%;
+        }
+
+        td {
+            vertical-align: top;
+            text-align: left;
+        }
+
+        .mon {
+            padding-bottom: 20px;
+        }
+
+        .tue {
+            padding-bottom: 20px;
+        }
+
+        .wed {
+            padding-bottom: 20px;
+        }
+
+        .thu {
+            padding-bottom: 20px;
+        }
+
+        .fri {
+            padding-bottom: 20px;
+        }
+
+        .sat {
+            padding-bottom: 20px;
+        }
+        .sun {
+            padding-bottom: 20px;
+        }
+
+        .buttons {
+            display: flex;
+            flex-direction: row;
+        }
+
+        .buttons > div {
+            padding-top: 10px;
+            padding-bottom: 10px;
+            margin-right: 25px;
+        }
+
+    </style>
+
+{% endblock %}

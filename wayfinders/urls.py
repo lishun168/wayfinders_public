@@ -14,10 +14,13 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from members.views import Index, Member, Company, MembersDirectory, DirectorySearch, LoginPage, MyProfile, EditMember, CreateMember
 from members import views as member_views
-from forum.views import ForumDirectory, ThreadPage
+from forum import views as forums_views
+from forum.views import ForumDirectory, ThreadPage, CreateDiscussion, CreatePost
+from cal.views import Calendar, CreateEvent, UpdateEvent, ViewEvent, CreateFilter
+from cal import views as calendar_views
 
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
@@ -36,7 +39,16 @@ urlpatterns = [
     path('create_profile/', CreateMember.as_view()),
     path('signup', member_views.signup, name='signup'),
     path('forum', ForumDirectory.as_view()),
-    path('forum/<int:pk>', ThreadPage.as_view())
+    path('forum/<int:pk>', ThreadPage.as_view()),
+    path('forum/create', CreateDiscussion.as_view()),
+    path('forum/post/<int:pk>', CreatePost.as_view()),
+    path('like', forums_views.like, name='like'),
+    path('flag', forums_views.flag, name='flag'),
+    path('calendar/<int:pk>', Calendar.as_view()),
+    path('edit_event/<int:pk>', UpdateEvent.as_view()),
+    path('create_event/<int:pk>', CreateEvent.as_view()),
+    path('event/<int:pk>', ViewEvent.as_view()),
+    path('create_filter/<int:pk>', CreateFilter.as_view()),
 
 ]
 

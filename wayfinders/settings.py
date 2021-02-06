@@ -61,6 +61,7 @@ TEMPLATES = [
         'DIRS': [
             os.path.join(BASE_DIR, 'wayfinders', 'templates'),
             os.path.join(BASE_DIR, 'members', 'templates'),
+            os.path.join(BASE_DIR, 'cal', 'templates'),
             os.path.join(BASE_DIR, 'forum', 'templates')
         ],
         'APP_DIRS': True,

@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}     
+
+
+<div class="event_details">
+    <div class="title">
+        <div>{{event.name}}</div>
+        <div class="inline"><a href="/edit_event/{{event.pk}}" > <img src="{%static 'members/img/edit.png' %}" height="15" width="15"> </a></div> 
+    </div>   <br>
+    <div>{{event.description}}</div><br>
+    <div><b>At:</b> {{event.date}}</div><br>
+    <div><b>Starts:</b> {{event.time}}</div><br>
+    <div><b>Ends:</b> {{event.end_time}}</div><br>
+</div>
+
+{% endblock %}
+
+{% block head %}
+    {{ block.super }}
+
+    <title>
+        Wayfinders {% block title %}{% endblock %}
+    </title>
+
+    {# favicon #}
+    <link href="#" rel="icon" type="image/x-icon" />
+
+    <style>
+        .event_details {
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .event_details > div {
+            width: 100%;
+            padding: 10px;
+        }
+
+        .title {
+            display: flex;
+            flex-direction: row;
+        }
+
+        .title > div {
+            margin-right: 10px;
+        }
+        
+
+    </style>
+
+{% endblock %}

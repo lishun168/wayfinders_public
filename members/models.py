@@ -31,6 +31,7 @@ class Member(models.Model):
 class Company(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField()
+    main_image = models.ImageField(upload_to="members/static/members/company_pic/", blank=True)
 
     def __str__(self):
         return '%s' % (self.name)

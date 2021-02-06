@@ -13,6 +13,7 @@ from django.http import HttpResponseRedirect
 from .models import Member as MemberModel
 from .models import Company as CompanyModel
 from .models import Role, Permissions, Skill, Industry, Gallery, MemberSkills, MemberCompany
+from cal.models import Calendar
 
 import logging
 logger = logging.getLogger(__name__)
@@ -45,6 +46,7 @@ class Member(View):
     def get(self, request, pk):
         my_profile = False
         member = MemberModel.objects.get(pk=pk)
+        calendar = Calendar.objects.get(member=member)
         memberskills = MemberSkills.objects.filter(member=pk)
         membercompanies = MemberCompany.objects.filter(member=pk)
         skills = Skill.objects.all()
@@ -62,7 +64,8 @@ class Member(View):
             'member_companies': membercompanies,
             'skills': skills,
             'permissions': permissions,
-            'my_profile': my_profile
+            'my_profile': my_profile,
+            'calendar': calendar
         }
         return render(request, self.template_name, context)
 
@@ -106,7 +109,7 @@ class Company(View):
     template_name = 'members/company.html'
 
     def get(self, request, pk):
-        company = Company.objects.filter(pk=pk)
+        company = CompanyModel.objects.get(pk=pk)
         context = {
             'company': company
         }
