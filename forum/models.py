@@ -29,6 +29,22 @@ class Post(models.Model):
     def __str__(self):
         return '%s - %s' % (self.thread, self.created_at )
 
+class Reply(models.Model):
+    thread = models.ForeignKey(Thread, on_delete=models.CASCADE)
+    body = models.TextField()
+    created_by = models.ForeignKey(Member, on_delete=models.SET_NULL, null=True, blank=True)
+    created_by_string = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True, auto_now=False)
+    edited_at = models.DateTimeField(auto_now_add=True, auto_now=False)
+    edited = models.BooleanField(default=False)
+    likes = models.IntegerField(default=0)
+    flagged = models.BooleanField(default=False)
+    number_of_flags = models.IntegerField(default=0)
+
+    def __str__(self):
+        return '%s - %s' % (self.thread, self.created_at )
+
+
 
 
 
