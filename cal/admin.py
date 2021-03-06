@@ -5,11 +5,10 @@ import calendar
 from django.urls import reverse
 from calendar import HTMLCalendar
 from django.utils.safestring import mark_safe
-from .models import Event, Calendar, Filter, Invitation
+from .models import Calendar, Filter
 
-admin.site.register(Event)
 admin.site.register(Calendar)
 admin.site.register(Filter)
-admin.site.register(Invitation)
+
 
 

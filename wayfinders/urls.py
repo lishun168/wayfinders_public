@@ -21,6 +21,7 @@ from forum import views as forums_views
 from forum.views import ForumDirectory, ThreadPage, CreateDiscussion, UpdateDiscussion, CreatePost, UpdatePost, CreateReply, UpdateReply
 from cal.views import Calendar, CreateEvent, UpdateEvent, ViewEvent, CreateFilter
 from cal import views as calendar_views
+from groups.views import GroupDirectory
 
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
@@ -53,6 +54,8 @@ urlpatterns = [
     path('create_event/<int:pk>', CreateEvent.as_view()),
     path('event/<int:pk>', ViewEvent.as_view()),
     path('create_filter/<int:pk>', CreateFilter.as_view()),
+    path('groups/', GroupDirector.as_view()),
+    path('group/<int:pk>', GroupDirectory.as_view())
 
 ]
 
