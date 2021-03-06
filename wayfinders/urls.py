@@ -18,7 +18,7 @@ from django.urls import path, include
 from members.views import Index, Member, Company, MembersDirectory, DirectorySearch, LoginPage, MyProfile, EditMember, CreateMember
 from members import views as member_views
 from forum import views as forums_views
-from forum.views import ForumDirectory, ThreadPage, CreateDiscussion, CreatePost
+from forum.views import ForumDirectory, ThreadPage, CreateDiscussion, UpdateDiscussion, CreatePost, UpdatePost, CreateReply, UpdateReply
 from cal.views import Calendar, CreateEvent, UpdateEvent, ViewEvent, CreateFilter
 from cal import views as calendar_views
 
@@ -41,7 +41,11 @@ urlpatterns = [
     path('forum', ForumDirectory.as_view()),
     path('forum/<int:pk>', ThreadPage.as_view()),
     path('forum/create', CreateDiscussion.as_view()),
+    path('forum/update/<int:pk>', UpdateDiscussion.as_view()),
     path('forum/post/<int:pk>', CreatePost.as_view()),
+    path('forum/post/update/<int:pk>', UpdatePost.as_view()),
+    path('forum/reply/<int:pk>/<int:post_pk>', CreateReply.as_view()),
+    path('forum/reply/update/<int:pk>', UpdateReply.as_view()),
     path('like', forums_views.like, name='like'),
     path('flag', forums_views.flag, name='flag'),
     path('calendar/<int:pk>', Calendar.as_view()),

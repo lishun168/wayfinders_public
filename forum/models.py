@@ -14,6 +14,10 @@ class Thread(models.Model):
     def __str__(self):
         return '%s' % (self.title)
 
+    class Meta:
+        verbose_name='Discussion'
+        verbose_name_plural='Discussions'
+
 class Post(models.Model):
     thread = models.ForeignKey(Thread, on_delete=models.CASCADE)
     body = models.TextField()
@@ -40,9 +44,44 @@ class Reply(models.Model):
     likes = models.IntegerField(default=0)
     flagged = models.BooleanField(default=False)
     number_of_flags = models.IntegerField(default=0)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
 
     def __str__(self):
         return '%s - %s' % (self.thread, self.created_at )
+
+    class Meta:
+        verbose_name='Reply'
+        verbose_name_plural='Replies'
+
+class MemberLikeOrFlagPost(models.Model):
+    member = models.ForeignKey(Member, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return '%s - %s' % (self.member, self.post)
+
+    class Meta:
+        verbose_name='Member Likes Post'
+        verbose_name_plural='Members Like Posts'
+
+class MemberLikeOrFlagReply(models.Model):
+    member = models.ForeignKey(Member, on_delete=models.CASCADE)
+    reply = models.ForeignKey(Reply, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return '%s - %s' % (self.member, self.reply)
+
+    class Meta:
+        verbose_name='Member Likes Reply'
+        verbose_name_plural='Members Like Replies'
+
+
+
+
+
+
+    #like or flag async
+    #filtering like and dislike
 
 
 
