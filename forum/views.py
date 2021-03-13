@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.views import View
-from .models import Thread, Post, Reply
+from .models import Thread, Post, Reply, MemberLikeOrFlagPost, MemberLikeOrFlagReply
 from members.models import Member
 from django.views.generic.edit import CreateView, UpdateView
 from django.http import HttpResponseRedirect, HttpResponse
@@ -36,7 +36,7 @@ class ThreadPage(View):
             'thread': thread,
             'posts': posts,
             'replies': replies,
-            'user': user_member
+            'user': user_member,
         }
 
         return render(request, self.template_name, context)
@@ -158,19 +158,67 @@ class UpdateReply(UpdateView):
 
 @csrf.csrf_exempt
 def like(request):
-    id = request.POST.get('pk')
-    post = Post.objects.get(pk=id)
-    post.likes += 1
+    member_pk = request.POST.get('member_pk')
+    post_pk = request.POST.get('post_pk')
+    post = Post.objects.get(pk=post_pk)
+    member_post = MemberLikeOrFlagPost.objects.get(member=member_pk, post=post_pk)
+    if member_post.like is True:
+        member_post.flagged = False
+        post.number_of_flags -=1
+    else:
+        member_post.flagged = True
+        post.number_of_flags += 1
+        post.flagged = True
+    post.save()
+    return HttpResponse('success')
+
+@csrf.csrf_exempt
+def like_reply(request):
+    member_pk = request.POST.get('member_pk')
+    post_pk = request.POST.get('post_pk')
+    post = Post.objects.get(pk=post_pk)
+    member_post = MemberLikeOrFlagPost.objects.get(member=member_pk, post=post_pk)
+    if member_post.like is True:
+        member_post.flagged = False
+        post.number_of_flags -=1
+    else:
+        member_post.flagged = True
+        post.number_of_flags += 1
+        post.flagged = True
     post.save()
     return HttpResponse('success')
 
 @csrf.csrf_exempt
 def flag(request):
-    id = request.POST.get('pk')
-    post = Post.objects.get(pk=id)
-    post.flagged = True
-    post.number_of_flags += 1
+    member_pk = request.POST.get('member_pk')
+    post_pk = request.POST.get('post_pk')
+    post = Post.objects.get(pk=post_pk)
+    member_post = MemberLikeOrFlagPost.objects.get(member=member_pk, post=post_pk)
+    if member_post.flagged is True:
+        member_post.flagged = False
+        post.number_of_flags -=1
+    else:
+        member_post.flagged = True
+        post.number_of_flags += 1
+        post.flagged = True
     post.save()
     return HttpResponse('success')
+
+@csrf.csrf_exempt
+def flag_reply(request):
+    member_pk = request.POST.get('member_pk')
+    reply_pk = request.POST.get('post_pk')
+    reply = Reply.objects.get(pk=reply_pk)
+    member_reply = MemberLikeOrFlagReply.objects.get(member=member_pk, reply=reply_pk)
+    if member_reply.flagged is True:
+        member_reply.flagged = False
+        reply.number_of_flags -=1
+    else:
+        member_reply.flagged = True
+        reply.number_of_flags += 1
+        reply.flagged = True
+    post.save()
+    return HttpResponse('success')
+
 
 

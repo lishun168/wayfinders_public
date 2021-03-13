@@ -5,7 +5,8 @@ from django.views import View
 from datetime import date
 from calendar import HTMLCalendar
 from itertools import groupby
-from .models import Calendar as CalendarModel, Event, Filter
+from .models import Calendar as CalendarModel, Filter
+from events.models import Event
 from django.http import HttpResponseRedirect, HttpResponse
 from django.views.decorators import csrf
 from django.views.generic.edit import CreateView, UpdateView
@@ -58,55 +59,52 @@ class EventCalendar(HTMLCalendar):
     def day_cell(self, cssclass, body):
         return '<td class="%s">%s</td>' % (cssclass, body)
 
+def get_calendar_context(calendar, filt, date):
+    times = [
+            "12 AM", "1 AM", "2 AM", "3 AM", "4 AM", "5 AM",
+            "6 AM", "7 AM", "8 AM", "9 AM", "10 AM", "11 AM",
+            "12 PM", "1 PM", "2 PM", "3 PM", "4 PM", "5 PM",
+            "6 PM", "7 PM", "8 PM", "9 PM", "10 PM", "11 PM"
+        ]
+
+    events = Event.objects.all()
+    html_c = EventCalendar(events).formatmonth(date.year, date.month)
+    context = {
+            'month': date.month,
+            'year': date.year,
+            'day': date.day,
+            'week': date.weekday,
+            'calendar': calendar,
+            'html_calendar': mark_safe(html_c),
+            'times': times,
+            'filters': filt
+    }   
+
+    return context
+
 class Calendar(View):
     template_name = 'cal/calendar.html'
+    today = datetime.today()
 
     def get(self, request, pk):
 
         c = CalendarModel.objects.get(pk=pk)
         f = Filter.objects.filter(calendar=c)
         today = datetime.today()
-        tomorrow = datetime(today.year, today.month, today.day + 1)
-        times = [
-            "12 AM",
-            "1 AM",
-            "2 AM",
-            "3 AM",
-            "4 AM",
-            "5 AM",
-            "6 AM",
-            "7 AM",
-            "8 AM",
-            "9 AM",
-            "10 AM",
-            "11 AM",
-            "12 PM",
-            "1 PM",
-            "2 PM",
-            "3 PM",
-            "4 PM",
-            "5 PM",
-            "6 PM",
-            "7 PM",
-            "8 PM",
-            "9 PM",
-            "10 PM",
-            "11 PM"
-        ]
-        
-        events = Event.objects.all()
-        html_c = EventCalendar(events).formatmonth(today.year, today.month)
+        context = get_calendar_context(c, f, today)
 
-        context = {
-            'month': today.month,
-            'year': today.year,
-            'day': today.day,
-            'week': today.weekday,
-            'calendar': c,
-            'html_calendar': mark_safe(html_c),
-            'times': times,
-            'filters': f
-        }
+        return render(request, self.template_name, context)
+
+class CalendarDate(View):
+    template_name = 'cal/calendar.html'
+
+    def get(self, request, pk, year, month):
+        c = CalendarModel.objects.get(pk=pk)
+        f = Filter.objects.filter(calendar=c)
+        today = datetime.today()
+        new_date = today.replace(year=year, month=month)
+        
+        context = get_calendar_context(c, f, new_date)
 
         return render(request, self.template_name, context)
 

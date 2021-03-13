@@ -19,7 +19,7 @@ from members.views import Index, Member, Company, MembersDirectory, DirectorySea
 from members import views as member_views
 from forum import views as forums_views
 from forum.views import ForumDirectory, ThreadPage, CreateDiscussion, UpdateDiscussion, CreatePost, UpdatePost, CreateReply, UpdateReply
-from cal.views import Calendar, CreateEvent, UpdateEvent, ViewEvent, CreateFilter
+from cal.views import Calendar, CreateEvent, UpdateEvent, ViewEvent, CreateFilter, CalendarDate
 from cal import views as calendar_views
 from groups.views import GroupDirectory
 
@@ -47,14 +47,15 @@ urlpatterns = [
     path('forum/post/update/<int:pk>', UpdatePost.as_view()),
     path('forum/reply/<int:pk>/<int:post_pk>', CreateReply.as_view()),
     path('forum/reply/update/<int:pk>', UpdateReply.as_view()),
-    path('like', forums_views.like, name='like'),
-    path('flag', forums_views.flag, name='flag'),
+    path('like/<int:member_pk>/<int:post_pk>', forums_views.like, name='like'),
+    path('flag/<int:member_pk>/<int:post_pk>', forums_views.flag, name='flag'),
     path('calendar/<int:pk>', Calendar.as_view()),
+    path('calendar/<int:pk>/<int:year>/<int:month>', CalendarDate.as_view()),
     path('edit_event/<int:pk>', UpdateEvent.as_view()),
     path('create_event/<int:pk>', CreateEvent.as_view()),
     path('event/<int:pk>', ViewEvent.as_view()),
     path('create_filter/<int:pk>', CreateFilter.as_view()),
-    path('groups/', GroupDirector.as_view()),
+    path('groups/', GroupDirectory.as_view()),
     path('group/<int:pk>', GroupDirectory.as_view())
 
 ]

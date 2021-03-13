@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.views import View
 from .models import Groups
 
-class GroupDirector(View):
+class GroupDirectory(View):
     template_name="groups/groups_index.html"
 
     def get(self, request):

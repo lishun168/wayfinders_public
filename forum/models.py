@@ -56,6 +56,8 @@ class Reply(models.Model):
 class MemberLikeOrFlagPost(models.Model):
     member = models.ForeignKey(Member, on_delete=models.CASCADE)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    flagged = models.BooleanField(default=False)
+    like = models.BooleanField(default=False)
 
     def __str__(self):
         return '%s - %s' % (self.member, self.post)
@@ -67,6 +69,8 @@ class MemberLikeOrFlagPost(models.Model):
 class MemberLikeOrFlagReply(models.Model):
     member = models.ForeignKey(Member, on_delete=models.CASCADE)
     reply = models.ForeignKey(Reply, on_delete=models.CASCADE)
+    flagged = models.BooleanField(default=False)
+    like = models.BooleanField(default=False)
 
     def __str__(self):
         return '%s - %s' % (self.member, self.reply)

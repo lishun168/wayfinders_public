@@ -35,13 +35,13 @@
                         {% endif %}
                     </div>
                    <div class="post_sub_footer">
-                       <div >
+                       <div class="like_button">
                             <a href="/like"><div class="right-side"><img src="{%static 'members/img/thumbs_up.png' %}" width="25" height="25"></div></a>
                        </div>
                        <div>
                            {{post.likes}}
                        </div>
-                       <div class="text_button" >
+                       <div class="text_button flag_button" >
                             <a href="/flag"><div class="right-side"><img src="{%static 'members/img/flag.png' %}" width="25" height="25"></div></a>
                        </div>
                        <div class="text_button"> <a href="/forum/reply/{{post.thread.pk}}/{{post.pk}}">REPLY</a></div>
@@ -176,10 +176,28 @@
     </style>
     <script>
         $(document).ready( function() {
-            $("#search-button").click( function(event) {
-                var str = $('#search_query').val();
-                var search_url = "http://127.0.0.1:8000/search/" + str;
-                window.location.replace(search_url);
+            $(".like_button").click( function(event) {
+                $.ajax({
+                    url:'like',
+                    data: {
+
+                    },
+                    type: 'POST'
+                }).done(function(response){
+                    console.log(response);
+                });
+            });
+
+            $(".flag_button").click( function(event) {
+                $.ajax({
+                    url:'flag',
+                    data: {
+
+                    },
+                    type: 'POST'
+                }).done(function(response){
+                    console.log(response);
+                });
             });
         });
     </script>

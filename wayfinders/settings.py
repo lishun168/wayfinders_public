@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'forum',
     'cal',
     'events',
-    'groups'
+    'groups',
+    'bootstrap3_datetime'
 ]
 
 MIDDLEWARE = [

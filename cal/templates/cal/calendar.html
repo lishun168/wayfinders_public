@@ -11,6 +11,16 @@
             <h3>
             {{calendar.name}} - {{ month }} {{ year }}
             </h3>
+            <div class="datepicker-section">
+                <div class="form-group datep">
+                    <label >Change the Date</label>
+                    <input id="date-input" type="date" name="bday" max="3000-12-31" 
+                           min="1000-01-01" class="form-control">
+                </div>
+                <div>
+                    <button id="#datepicker_submit">Change Date</button>
+                </div>
+            </div>
             <div class="buttons">
                 <div> <a href="/create_event/{{calendar.pk}}"><button>Create Event</button></a></div>
                 <div> <a href="/create_filter/{{calendar.pk}}"><button>Create Filter</button></a></div>
@@ -151,6 +161,29 @@
             margin-right: 25px;
         }
 
+        .datep {
+            width: 500px;
+        }
+
+        .datepicker-section {
+            display: flex;
+            flex-direction: row;
+            align-items: baseline;
+        }
+
+        #datepicker-submit {
+            height: 20px;
+        }
+
     </style>
+    <script>
+        $('#datepicker').datepicker();
+
+        $('#datepicker-submit').click(function(event) {
+            console.log("click");
+            const date = $('#date-input').val();
+            console.log(date);
+        });
+    </script>
 
 {% endblock %}
