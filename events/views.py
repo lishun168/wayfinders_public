@@ -1,19 +1,21 @@
 from django.views.generic.edit import CreateView, UpdateView
-from .models import Invitation
+from .models import Invitation, Event
 from django.http import HttpResponseRedirect
 
 class CreateInvitation(CreateView):
-    template_name = 'create_invitation.html'
+    template_name = 'events/create_invitation.html'
     model = Invitation
-    fields = ('member','event')
+    fields = ('member',)
 
     def dispatch(self, *args, **kwargs):
         return super(CreateInvitation, self).dispatch(*args, **kwargs)
 
     def form_valid(self, form):
         obj = form.save(commit=False)
-
-        obj.save()
+        event_pk = self.kwargs.get('pk')
+        event = Event.objects.get(pk=event_pk)
+        obj.events = event
+        obj.save()      
 
         success_url = '/'
         return HttpResponseRedirect(success_url)

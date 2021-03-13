@@ -6,7 +6,7 @@ from datetime import date
 from calendar import HTMLCalendar
 from itertools import groupby
 from .models import Calendar as CalendarModel, Filter
-from events.models import Event
+from events.models import Event, Invitation
 from django.http import HttpResponseRedirect, HttpResponse
 from django.views.decorators import csrf
 from django.views.generic.edit import CreateView, UpdateView
@@ -156,9 +156,10 @@ class ViewEvent(View):
     
     def get(self, request, pk):
         eve = Event.objects.get(pk=pk)
-
+        invitations = Invitation.objects.filter(events=eve)
         context = {
-            'event': eve
+            'event': eve,
+            'invitations': invitations
         }
 
         return render(request, self.template_name, context)

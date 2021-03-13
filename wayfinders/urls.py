@@ -20,6 +20,7 @@ from members import views as member_views
 from forum import views as forums_views
 from forum.views import ForumDirectory, ThreadPage, CreateDiscussion, UpdateDiscussion, CreatePost, UpdatePost, CreateReply, UpdateReply
 from cal.views import Calendar, CreateEvent, UpdateEvent, ViewEvent, CreateFilter, CalendarDate
+from events.views import CreateInvitation
 from cal import views as calendar_views
 from groups.views import GroupDirectory
 
@@ -54,6 +55,7 @@ urlpatterns = [
     path('edit_event/<int:pk>', UpdateEvent.as_view()),
     path('create_event/<int:pk>', CreateEvent.as_view()),
     path('event/<int:pk>', ViewEvent.as_view()),
+    path('invite/<int:pk>', CreateInvitation.as_view()), #invite/{{event.pk}} - invite/1
     path('create_filter/<int:pk>', CreateFilter.as_view()),
     path('groups/', GroupDirectory.as_view()),
     path('group/<int:pk>', GroupDirectory.as_view())

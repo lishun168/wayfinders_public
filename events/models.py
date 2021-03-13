@@ -12,6 +12,8 @@ class Event(models.Model):
     end_time = models.TimeField(u'Final time', default=datetime.now)
     calendar_filter = models.ForeignKey(Filter, on_delete=models.SET_NULL, null=True, blank=True)
     public = models.BooleanField(default=True)
+    is_open = models.BooleanField(default=False)
+    open_editing = models.BooleanField(default=False)
 
     def __str__(self):
         return '%s - %s' % (self.calendar, self.name)
@@ -32,11 +34,19 @@ class Event(models.Model):
         return u'<a href="%s">%s</a>' % (url, str(self.time))
 
 class Invitation(models.Model):
-    member=models.ForeignKey(Member,on_delete=models.CASCADE)
-    events=models.ForeignKey(Event,on_delete=models.CASCADE)
+    member=models.ForeignKey(Member,on_delete=models.CASCADE) #choose the member
+    events=models.ForeignKey(Event,on_delete=models.CASCADE) #pull the id of the event
     accept=models.BooleanField(default=False)
     decline=models.BooleanField(default=False)
 
-class Organizers(models.Model):
+    def __str__(self):
+        return '%s - %s' % (self.events, self.member)
+
+class Participants(models.Model):
     member=models.ForeignKey(Member,on_delete=models.CASCADE)
     events=models.ForeignKey(Event,on_delete=models.CASCADE)
+    is_administrator = models.BooleanField(default=False)
+
+    def __str__(self):
+        return '%s - %s' % (self.events, self.member)
+

@@ -14,6 +14,13 @@
     <div><b>At:</b> {{event.date}}</div><br>
     <div><b>Starts:</b> {{event.time}}</div><br>
     <div><b>Ends:</b> {{event.end_time}}</div><br>
+    <a href="/invite/{{event.pk}}"><button>Invite Member</button></a>
+</div>
+
+<div class="events_details">
+    {% for invitation in invitations %}
+        <b>{{invitation.member}}</b> - Accepted: {{invitation.accept}} - Declined: {{invitation.decline}}   
+    {% endfor %}
 </div>
 
 {% endblock %}
