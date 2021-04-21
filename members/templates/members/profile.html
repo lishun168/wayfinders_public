@@ -5,19 +5,7 @@
 {% block content %}
 
 <div class="section">
-    <div class="title_wrapper">
-        <div class="title_bar">
-            <h3>{{profile.first_name}} {{profile.last_name}} - {{profile.job_title}}</h3>
-        </div>
-        {% if my_profile == True %}
-        <div class="inline"><a href="/edit_profile/{{profile.pk}}" > <img src="{%static 'members/img/edit.png' %}" height="30" width="30"> </a></div>
-        <div class="inline"><a href="/calendar/{{calendar.pk}}"><img src="{%static 'members/img/calendar.png' %}" height="30" width="30"></a></div>
-        {% endif %}
-    </div>
-   
-    <div class="profile_picture">
-        <img src="/static/members/profile_pic/MC-0036.JPG" width="400" height="650">
-    </div>
+    {% include 'members/base_profile.html' %}
     <div class="profile">
         <div class="profile_section">
             <div class="subtitle">Location:</div>
@@ -25,28 +13,61 @@
             <div>{{profile.city}}, {{profile.province}}, {{profile.country}}</div>
             <div>{{profile.postal_code}}</div>
         </div>
-        
+        <div class="profile_section">
+            <div class="subtitle">Bio:</div>
+            <div class="bio">{{profile.bio}}</div>
+            <br>
+        </div>
         <div class="profile_section">
             <div class="subtitle">Website:</div>
             <a href="{{profile.website}}"><div>{{profile.website}}</div></a>
         </div>
         <div class="profile_section">
-            <div class="subtitle">Contact:</div>
+            <div class="subtitle">Business:</div>
             <div>{{profile.business_phone}}</div>
+            {% if profile.home_phone != None %}
+            <div class="subtitle">Home:</div>
             <div>{{profile.home_phone}}</div>
+            {% endif %}
+            {% if profile.cell_phone != None %}
+            <div class="subtitle">Cell:</div>
             <div>{{profile.cell_phone}}</div>
+            {% endif %}
+            <div class="subtitle">Email:</div>
             <div>{{profile.email}}</div>
         </div>
         <div class="profile_section">
-            <div class="subtitle">Company:</div>
+            {% if my_profile == True %}
+            <a href="/my_groups/{{profile.pk}}" > 
+                <div class="inline">
+                    <div class="subtitle">Groups:</div>
+                    <img src="{%static 'members/img/edit.png' %}" height="16" width="16"> 
+                </div>
+            </a>
+            {% else %}
+            <div class="inline">
+                <div class="subtitle">Groups:</div> 
+            </div>
+            {% endif %}
             {% for company in member_companies %}
-            <a href="/company/{{company.pk}}"><div>{{company.company}}</div></a>
+            <a href="/group/{{company.company.pk}}"><div>{{company.company}}</div></a>
             {% endfor %}
         </div>
         <div class="profile_section">
-            <div class="subtitle">Skills:</div>
+            {% if my_profile == True %}
+            <a href="/my_skills/{{profile.pk}}" > 
+                <div class="inline">
+                    <div class="subtitle">Skills:</div>
+                    <img src="{%static 'members/img/edit.png' %}" height="16" width="16"> 
+                </div>
+            </a>
+            {% else %}
+            <div class="inline">
+                <div class="subtitle">Skills:</div>
+            </div>
+            {% endif %}
             {% for skill in member_skills %}
-            <div>{{skill.skill}}</div>
+                <a href="/skill/{{skill.pk}}"><div>{{skill.skill}}</div></a>
             {% endfor %}
         </div>
         <div class="profile_section">
@@ -70,17 +91,10 @@
 
     <style>
 
-        .section {
-            padding-top: 25px;
-            padding-bottom: 25px;
-            padding-left: 10%;
-            padding-right: 10%;
-            overflow: hidden;
-        }
-
         .subtitle {
             color:  #398677;
             font-weight: bold;
+            margin-right: 5px;
         }
 
         .title_wrapper {
@@ -106,7 +120,17 @@
         }
 
         .inline {
-            display:inline;
+            display:flex;
+            align-items: center;
+        }
+
+        .profile {
+            display: block;
+            overflow: hidden;
+        }
+
+        .bio {
+            width: 50%;
         }
 
     </style>

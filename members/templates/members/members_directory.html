@@ -3,7 +3,7 @@
 {% load static %}
 
 {% block content %}
-<div class="body-content">
+<div class="section">
     <h1>Members Directory</h1>
 
     <div class="input-group mb-3">
@@ -14,8 +14,9 @@
     </div>
 
     {% for member in members %}
+        {% if member.publicly_viewable == True %}
         <a href="/profile/{{member.pk}}"> <div> {{member.last_name }}, {{member.first_name}}  - {{member.job_title}}</div></a>
-
+        {% endif %}
 {% endfor %}
 </div>
 

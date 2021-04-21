@@ -21,3 +21,4 @@ class Filter(models.Model):
 
     def __str__(self):
         return '%s - %s' % (self.calendar, self.name)
+

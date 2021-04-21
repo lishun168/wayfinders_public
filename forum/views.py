@@ -42,10 +42,14 @@ class ThreadPage(View):
         return render(request, self.template_name, context)
 
 class CreateDiscussion(CreateView):
-    template_name = 'forum/create_discussion.html'
+    template_name = 'create_edit_model.html'
     model = Thread
     fields = ('title', 'subtitle')
     
+    def get_context_data(self, **kwargs):
+        context = super(CreateDiscussion, self).get_context_data(**kwargs)
+        context['button_text'] = 'Create Discussion'
+        return context
 
     def dispatch(self, *args, **kwargs):
         return super(CreateDiscussion, self).dispatch(*args, **kwargs)
@@ -61,9 +65,14 @@ class CreateDiscussion(CreateView):
         return HttpResponseRedirect(success_url)
 
 class UpdateDiscussion(UpdateView):
-    template_name = 'forum/update_discussion.html'
+    template_name = 'create_edit_models.html'
     model = Thread
     fields = ('title', 'subtitle')
+
+    def get_context_data(self, **kwargs):
+        context = super(UpdateDiscussion, self).get_context_data(**kwargs)
+        context['button_text'] = 'Update Discussion'
+        return context
 
     def dispatch(self, *args, **kwargs):
         return super(UpdateDiscussion, self).dispatch(*args, **kwargs)
@@ -77,9 +86,14 @@ class UpdateDiscussion(UpdateView):
    
 
 class CreatePost(CreateView):
-    template_name = 'forum/create_post.html'
+    template_name = 'create_edit_model.html'
     model = Post
     fields = ('body',)
+
+    def get_context_data(self, **kwargs):
+        context = super(CreatePost, self).get_context_data(**kwargs)
+        context['button_text'] = 'Create Post'
+        return context
 
     def dispatch(self, *args, **kwargs):
         return super(CreatePost, self).dispatch(*args, **kwargs)
@@ -98,9 +112,14 @@ class CreatePost(CreateView):
         return HttpResponseRedirect(success_url)
 
 class UpdatePost(UpdateView):
-    template_name = 'forum/update_post.html'
+    template_name = 'create_edit_model.html'
     model = Post
     fields = ('body',)
+
+    def get_context_data(self, **kwargs):
+        context = super(UpdatePost, self).get_context_data(**kwargs)
+        context['button_text'] = 'Update Post'
+        return context
 
     def dispatch(self, *args, **kwargs):
         return super(UpdatePost, self).dispatch(*args, **kwargs)
@@ -115,9 +134,14 @@ class UpdatePost(UpdateView):
     
 
 class CreateReply(CreateView):
-    template_name = 'forum/create_reply.html'
+    template_name = 'create_edit_model.html'
     model = Reply
     fields = ('body',)
+
+    def get_context_data(self, **kwargs):
+        context = super(CreateReply, self).get_context_data(**kwargs)
+        context['button_text'] = 'Create Reply'
+        return context
 
     def dispatch(self, *args, **kwargs):
         return super(CreateReply, self).dispatch(*args, **kwargs)
@@ -141,9 +165,14 @@ class CreateReply(CreateView):
         return HttpResponseRedirect(success_url)
 
 class UpdateReply(UpdateView):
-    template_name = 'forum/update_reply.html'
+    template_name = 'create_edit_model.html'
     model = Reply
     fields = ('body',)
+
+    def get_context_data(self, **kwargs):
+        context = super(UpdateReply, self).get_context_data(**kwargs)
+        context['button_text'] = 'Update Reply'
+        return context
 
     def dispatch(self, *args, **kwargs):
         return super(UpdateReply, self).dispatch(*args, **kwargs)

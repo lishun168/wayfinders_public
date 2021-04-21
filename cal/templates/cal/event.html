@@ -8,19 +8,57 @@
 <div class="event_details">
     <div class="title">
         <div>{{event.name}}</div>
-        <div class="inline"><a href="/edit_event/{{event.pk}}" > <img src="{%static 'members/img/edit.png' %}" height="15" width="15"> </a></div> 
+        {% if my_part == True or event.open_editing == True %}
+            {% if admin == True or event.open_editing == True %}
+                <div class="inline"><a href="/edit_event/{{event.pk}}" > <img src="{%static 'members/img/edit.png' %}" height="15" width="15"> </a></div> 
+            {% endif %}
+        {% endif %}
     </div>   <br>
     <div>{{event.description}}</div><br>
     <div><b>At:</b> {{event.date}}</div><br>
     <div><b>Starts:</b> {{event.time}}</div><br>
     <div><b>Ends:</b> {{event.end_time}}</div><br>
-    <a href="/invite/{{event.pk}}"><button>Invite Member</button></a>
-</div>
 
-<div class="events_details">
-    {% for invitation in invitations %}
-        <b>{{invitation.member}}</b> - Accepted: {{invitation.accept}} - Declined: {{invitation.decline}}   
-    {% endfor %}
+    <div class="events_details">
+        <div class="subtitle">Invitations:</div>
+        {% for invitation in invitations %}
+            <b>{{invitation.member}}</b> - 
+            {% if invitation.accept == True %}
+            Accepted
+            {% endif %}
+            {% if invitation.decline == True %} 
+            Declined
+            {% endif %}
+            {% if invitation.accept == False and invitation.decline == False %}
+            Pending
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    <div class="events_details">
+        <div class="subtitle">Participants:</div>
+        {% for participant in participants %}
+            
+            <div>
+                <a href="/profile/{{participant.member.pk}}"><b>{{participant.member}}</b></a> 
+                {% if my_part == True %}
+                    {% if participant.is_administrator == False and admin == True %}
+                    {% endif %}
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+    <div class="button-row">
+        {% if my_part == True or event.is_open %}
+            {% if admin == True or event.is_open %}
+                <a href="/invite/{{event.pk}}"><button class="btn btn-primary">Invite Member</button></a>
+                {% if event.is_open and user.is_authenticated and my_part == False %}
+                <a href="/join/{{user.pk}}"><button class="btn btn-primary">Join Event</button></a>
+                {% endif %}
+            {% endif %}
+        {% endif %}
+    </div>
+
 </div>
 
 {% endblock %}

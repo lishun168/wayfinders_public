@@ -9,19 +9,26 @@
         <div class="title_bar">
             <h3>{{company.name}}</h3>
         </div>
-        {% if my_profile == True %}
-        <div class="inline"><a href="#" > <img src="{%static 'members/img/edit.png' %}" height="30" width="30"> </a></div>
+        {% if company_admin == True %}
+        <div class="inline"><a href="/edit_group/{{company.pk}}" > <img src="{%static 'members/img/edit.png' %}" height="30" width="30"> </a></div>
         {% endif %}
     </div>
    
     <div class="profile_picture">
-        <img src="/static/members/profile_pic/MC-0036.JPG" width="400" height="650">
+        {% if company.main_image.url != None %}
+        <img src="{{company.main_image.url}}" width="400" height="650" style="width: 400px; height: 650px; object-fit: contain; object-position: left top; margin-top: 5px;">
+        {% endif %}
     </div>
     <div class="profile">
         <div class="profile_section">
             <div class="subtitle">About Us:</div>
-            <div>{{company.description}}</div>
+            <div class="bio">{{company.description}}</div>
         </div>
+        {% if company_member %}
+        <div class="profile_section">
+            <a href="/leave_group/{{member_company.pk}}"><button class="btn btn-primary">Leave Group</button></a>
+        </div>
+        {% endif %}
     </div>
 </div>
 
@@ -39,14 +46,6 @@
     <link href="#" rel="icon" type="image/x-icon" />
 
     <style>
-
-        .section {
-            padding-top: 25px;
-            padding-bottom: 25px;
-            padding-left: 10%;
-            padding-right: 10%;
-            overflow: hidden;
-        }
 
         .subtitle {
             color:  #398677;
@@ -73,10 +72,16 @@
 
         .profile_section {
             margin-bottom: 25px;
+            display: block;
+            overflow: hidden;
         }
 
         .inline {
             display:inline;
+        }
+
+        .bio {
+            width: 50%;
         }
 
     </style>

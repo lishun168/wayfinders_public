@@ -15,15 +15,15 @@ class Member(models.Model):
     country = models.CharField(max_length=255)
     postal_code = models.CharField(max_length=255)
     business_phone = PhoneNumberField()
-    home_phone = PhoneNumberField()
-    cell_phone = PhoneNumberField()
+    home_phone = PhoneNumberField(null=True, blank=True)
+    cell_phone = PhoneNumberField(null=True, blank=True)
     email = models.EmailField(max_length=255)
     website = models.URLField(max_length=255)
     bio = models.TextField()
-    publicly_viewable = models.BooleanField(default=True)
-    membership_expiry = models.DateField(auto_now_add=False, auto_now=False)
-    membership_since = models.DateField(auto_now_add=False)
-    main_image = models.ImageField(upload_to="members/static/members/profile_pic/", blank=True)
+    publicly_viewable = models.BooleanField(u'Public', default=True)
+    membership_expiry = models.DateField(auto_now_add=False, auto_now=False, blank=True, null=True)
+    membership_since = models.DateField(auto_now_add=False, blank=True, null=True)
+    main_image = models.ImageField(upload_to="profile_gallery", blank=True)
 
     def __str__(self):
         return '%s %s' % (self.first_name, self.last_name)
@@ -31,14 +31,15 @@ class Member(models.Model):
 class Company(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField()
-    main_image = models.ImageField(upload_to="members/static/members/company_pic/", blank=True)
+    main_image = models.ImageField(upload_to="profile_gallery", blank=True)
+    public = models.BooleanField(default=True)
 
     def __str__(self):
         return '%s' % (self.name)
 
     class Meta:
-        verbose_name='Company'
-        verbose_name_plural='Companies'
+        verbose_name='Group'
+        verbose_name_plural='Groups'
 
 class Role(models.Model):
     title = models.CharField(max_length=255)
@@ -99,6 +100,7 @@ class Gallery(models.Model):
 class MemberCompany(models.Model):
     member = models.ForeignKey(Member, on_delete=models.CASCADE)
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
+    role = models.ForeignKey(Role, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return '%s: %s' % (self.company, self.member)

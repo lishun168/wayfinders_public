@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+<div class="section">
+    {% include 'members/base_profile.html' %}
+    <div class="profile">
+        <div class="profile_section">
+            <a href="/create_skill/{{profile.pk}}"><button>Add New Skill</button></a>
+        </div>
+        {%for fk_proxy in member_skills %}
+        <div class="profile_section">
+            <div>{{fk_proxy.skill.name}}</div>
+            <div>{{fk_proxy.skill.description}}</div>
+            
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+
+{% endblock %}
+
+{% block head %}
+    {{ block.super }}
+
+    <title>
+        Wayfinders {% block title %}{% endblock %}
+    </title>
+
+    {# favicon #}
+    <link href="#" rel="icon" type="image/x-icon" />
+
+    <style>
+
+        .subtitle {
+            color:  #398677;
+            font-weight: bold;
+        }
+
+        .title_wrapper {
+            width: 100%;
+        }
+
+        .title_bar {
+            background-color:  #398677;
+            color: #fff;
+            padding: 10px;
+            width: auto;
+            display: inline-block;
+        }
+
+        .profile_picture {
+            float: left;
+            width: 500px;
+            height: 650px;
+        }
+
+        .profile_section {
+            margin-bottom: 25px;
+        }
+
+        .inline {
+            display:inline;
+        }
+
+    </style>
+{% endblock %}

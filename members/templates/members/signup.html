@@ -5,8 +5,10 @@
 {% block content %}
 <div class="section">
     <form method="post">{% csrf_token %}
-        {{ form.as_p }}
-        <input type="submit" value="Create User">
+        <table>
+            {{form}}
+        </table>
+        <input class="btn btn-primary" type="submit" value="Create User">
     </form>
 </div>
 {% endblock %}
@@ -22,14 +24,6 @@
     <link href="#" rel="icon" type="image/x-icon" />
 
     <style>
-
-        .section {
-            padding-top: 25px;
-            padding-bottom: 25px;
-            padding-left: 10%;
-            padding-right: 10%;
-            overflow: hidden;
-        }
 
         .subtitle {
             color:  #398677;
@@ -56,6 +50,14 @@
 
         .profile_section {
             margin-bottom: 25px;
+        }
+
+        table {
+            border-spacing: 5px;
+        }
+
+        th, td {
+            padding: 10px;
         }
 
     </style>

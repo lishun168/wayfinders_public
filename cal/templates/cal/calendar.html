@@ -9,31 +9,30 @@
     <div class="calendar-header">
         <div class="calendar-title">
             <h3>
-            {{calendar.name}} - {{ month }} {{ year }}
+            {{calendar.name}} - {{ date_object|date:"F" }} {{ date_object.year }}
             </h3>
             <div class="datepicker-section">
                 <div class="form-group datep">
-                    <label >Change the Date</label>
                     <input id="date-input" type="date" name="bday" max="3000-12-31" 
                            min="1000-01-01" class="form-control">
                 </div>
                 <div>
-                    <button id="#datepicker_submit">Change Date</button>
+                    <button class="bnt btn-primary" id="datepicker-submit">Change Date</button>
                 </div>
             </div>
             <div class="buttons">
-                <div> <a href="/create_event/{{calendar.pk}}"><button>Create Event</button></a></div>
-                <div> <a href="/create_filter/{{calendar.pk}}"><button>Create Filter</button></a></div>
+                <div> <a href="/create_event/{{calendar.pk}}"><button class="bnt btn-primary">Create Event</button></a></div>
+                <div> <a href="/create_filter/{{calendar.pk}}"><button class="bnt btn-primary">Create Sub</button></a></div>
             </div>  
         </div>
         <div>
             {% for filter in filters %}
-            <label class="container">{{filter.name}}
+            <label data-id="{{filter.id}}" class="container filter-container">{{filter.name}}
                 <input type="checkbox" checked="checked">
                 <span class="checkmark"></span>
               </label>
             {% endfor %}
-            <div> <a href="/calendar/{{calendar.pk}}"><button>Filter By Calendar</button></a></div>
+            <div> <a href="/calendar/{{calendar.pk}}"><button class="bnt btn-primary filter-button">Select Calendar Views</button></a></div>
         </div>
         
         
@@ -169,21 +168,39 @@
             display: flex;
             flex-direction: row;
             align-items: baseline;
+            overflow: hidden;
         }
 
         #datepicker-submit {
-            height: 20px;
+            vertical-align: bottom;
+            margin-left: 10px;
+            margin-bottom: 5px;
+        }
+
+        #date-input {
         }
 
     </style>
     <script>
-        $('#datepicker').datepicker();
+        $(document).ready(function(){
 
-        $('#datepicker-submit').click(function(event) {
-            console.log("click");
-            const date = $('#date-input').val();
-            console.log(date);
-        });
+            $('#datepicker-submit').click(function(event) {
+                const date = $('#date-input').val();
+                const dateValues = date.split("-");
+                const currentURL = window.location.pathname;
+                const URLValues = currentURL.split("/");
+                const id = URLValues[2];
+                if(dateValues[0] != null && dateValues[0] != undefined && dateValues[1] != null){
+                    location.href = "/calendar/" + id + "/" + dateValues[0] + "/" + dateValues[1];
+                }
+                
+            });
+
+            $('.filter-button').click(function(event){
+                
+            })
+        })
+        
     </script>
 
 {% endblock %}

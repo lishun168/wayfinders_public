@@ -8,9 +8,9 @@ class Event(models.Model):
     description = models.TextField(u'Description', blank=True, null=True)
     calendar = models.ForeignKey(Calendar, on_delete=models.CASCADE)
     date = models.DateField(u'Day of Event', default=datetime.now)
-    time = models.TimeField(u'Starting time', default=datetime.now)
-    end_time = models.TimeField(u'Final time', default=datetime.now)
-    calendar_filter = models.ForeignKey(Filter, on_delete=models.SET_NULL, null=True, blank=True)
+    time = models.TimeField(u'Start Time', default=datetime.now)
+    end_time = models.TimeField(u'End Time', default=datetime.now)
+    sub_calendar = models.ForeignKey(Filter, on_delete=models.SET_NULL, null=True, blank=True)
     public = models.BooleanField(default=True)
     is_open = models.BooleanField(default=False)
     open_editing = models.BooleanField(default=False)
@@ -49,4 +49,8 @@ class Participants(models.Model):
 
     def __str__(self):
         return '%s - %s' % (self.events, self.member)
+
+    class Meta:
+        verbose_name='Participant'
+        verbose_name_plural='Participants'
 

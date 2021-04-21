@@ -5,8 +5,9 @@
 {% block content %}
 <div class="section">
     <form method="post">{% csrf_token %}
-        {{form.member.label}}: {{form.member}} <br> <br>
-        <br>
+        <table>
+            {{form}}
+        </table>
         <input type="submit" value="Create Invitation">
     </form>
 </div>

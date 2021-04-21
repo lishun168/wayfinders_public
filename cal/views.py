@@ -6,15 +6,13 @@ from datetime import date
 from calendar import HTMLCalendar
 from itertools import groupby
 from .models import Calendar as CalendarModel, Filter
-from events.models import Event, Invitation
+from events.models import Event, Invitation, Participants
+from members.models import Member
 from django.http import HttpResponseRedirect, HttpResponse
 from django.views.decorators import csrf
 from django.views.generic.edit import CreateView, UpdateView
-from django.forms.widgets import SelectDateWidget
-from django.contrib.admin.widgets import AdminDateWidget
+from django.forms.widgets import SelectDateWidget, TimeInput
 from django.utils.html import conditional_escape as esc
-
-
 
 import logging
 logger = logging.getLogger(__name__)
@@ -67,17 +65,14 @@ def get_calendar_context(calendar, filt, date):
             "6 PM", "7 PM", "8 PM", "9 PM", "10 PM", "11 PM"
         ]
 
-    events = Event.objects.all()
+    events = Event.objects.filter(date__year=date.year, date__month=date.month)
     html_c = EventCalendar(events).formatmonth(date.year, date.month)
     context = {
-            'month': date.month,
-            'year': date.year,
-            'day': date.day,
-            'week': date.weekday,
             'calendar': calendar,
             'html_calendar': mark_safe(html_c),
             'times': times,
-            'filters': filt
+            'filters': filt,
+            'date_object': date
     }   
 
     return context
@@ -109,36 +104,64 @@ class CalendarDate(View):
         return render(request, self.template_name, context)
 
 class CreateEvent(CreateView):
-    template_name = 'cal/create_event.html'
+    template_name = 'create_edit_model.html'
     model = Event
-    fields = ('name', 'description', 'date', 'time', 'end_time', 'public', 'calendar_filter')
+    fields = ('name', 'description', 'date', 'time', 'end_time', 'public', 'sub_calendar', 'is_open', 'open_editing')
 
     def get_form(self):
         today = datetime.today()
         form = super(CreateEvent, self).get_form()
+        form.fields['date'].widget = SelectDateWidget()
+        form.fields['time'].widget = TimeInput(attrs={'type': 'time'})
+        form.fields['end_time'].widget = TimeInput(attrs={'type': 'time'})
         return form
 
+    def get_context_data(self, **kwargs):
+        context = super(CreateEvent, self).get_context_data(**kwargs)
+        context['button_text'] = 'Create Event'
+        return context
 
     def dispatch(self, *args, **kwargs):
         return super(CreateEvent, self).dispatch(*args, **kwargs)
 
     def form_valid(self, form):
-        logger.error("form_valid")
         obj = form.save(commit=False)
+
         cal_pk = self.kwargs.get('pk')
         cal = CalendarModel.objects.get(pk=cal_pk)
-        obj.calendar = cal
-        logger.error(obj)
+
+        obj.calendar = cal  
         obj.save() 
+
+        member = Member.objects.get(user=self.request.user)
+
+        part = Participants()
+        part.member = member
+        part.events = obj
+        part.is_administrator = True
+        part.save()
 
         success_url = "/calendar/" + str(cal_pk)
         return HttpResponseRedirect(success_url)
 
 class UpdateEvent(UpdateView):
-    template_name = 'cal/update_event.html'
+    template_name = 'create_edit_model.html'
     model = Event
-    fields = ('name', 'description', 'date', 'time', 'end_time', 'public', 'calendar_filter')
+    fields = ('name', 'description', 'date', 'time', 'end_time', 'public', 'sub_calendar', 'is_open')
     success_url = "/"
+
+    def get_form(self):
+        today = datetime.today()
+        form = super(UpdateEvent, self).get_form()
+        form.fields['date'].widget = SelectDateWidget()
+        form.fields['time'].widget = TimeInput(attrs={'type': 'time'})
+        form.fields['end_time'].widget = TimeInput(attrs={'type': 'time'})
+        return form
+
+    def get_context_data(self, **kwargs):
+        context = super(UpdateEvent, self).get_context_data(**kwargs)
+        context['button_text'] = 'Update Event'
+        return context
 
     def dispatch(self, *args, **kwargs):
         return super(UpdateEvent, self).dispatch(*args, **kwargs)
@@ -157,17 +180,41 @@ class ViewEvent(View):
     def get(self, request, pk):
         eve = Event.objects.get(pk=pk)
         invitations = Invitation.objects.filter(events=eve)
+        participants = Participants.objects.filter(events=eve)
+        member = Member.objects.get(user=request.user)
+
         context = {
             'event': eve,
-            'invitations': invitations
+            'invitations': invitations,
+            'participants': participants
         }
 
-        return render(request, self.template_name, context)
+        try:
+            my_participation = Participants.objects.get(events=eve, member=member)
+            context.update({
+                'my_part': True,
+                'admin': my_participation.is_administrator
+            })
+            return render(request, self.template_name, context)
+        except Participants.DoesNotExist:
+            context.update({
+                'my_part': False
+            })
+            return render(request, self.template_name, context)
+            
+        
+
+        
 
 class CreateFilter(CreateView):
-    template_name = 'cal/create_filter.html'
+    template_name = 'create_edit_model.html'
     model = Filter
     fields = ('name',)
+
+    def get_context_data(self, **kwargs):
+        context = super(CreateFilter, self).get_context_data(**kwargs)
+        context['button_text'] = 'Create Sub Calendar'
+        return context
 
     def dispatch(self, *args, **kwargs):
         return super(CreateFilter, self).dispatch(*args, **kwargs)

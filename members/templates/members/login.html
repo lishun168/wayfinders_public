@@ -6,9 +6,14 @@
 
 
 <div class="section">
+    {{message}}
 <form method="post" action="login/"> {% csrf_token %}
-  {{form.as_p}}
-
+    <table>
+        {{form}}
+    </table>
+    <div class="m_form_button_wrapper">
+        <input class="btn btn-primary" type="submit" name="submit" value="Login">
+    </div>
   <input type="submit" name="submit" value="Login">
 </form>
 </div>
@@ -26,14 +31,6 @@
     <link href="#" rel="icon" type="image/x-icon" />
 
     <style>
-
-        .section {
-            padding-top: 25px;
-            padding-bottom: 25px;
-            padding-left: 10%;
-            padding-right: 10%;
-            overflow: hidden;
-        }
 
     </style>
 {% endblock %}

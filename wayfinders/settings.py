@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'cal',
     'events',
     'groups',
-    'bootstrap3_datetime'
+    'bootstrap3_datetime',
+    
 ]
 
 MIDDLEWARE = [
@@ -135,5 +136,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = str(BASE_DIR) + '/static/'
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
 
 LOGIN_REDIRECT_URL = 'home'
