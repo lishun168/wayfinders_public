@@ -328,7 +328,7 @@ class CreateGroup(CreateView):
 class CreateSkill(CreateView):
     template_name = 'create_edit_model.html'
     model = Skill
-    fields = '__all__'
+    fields = ('name', 'description')
 
     def dispatch(self, *args, **kwargs):
         return super(CreateSkill, self).dispatch(*args, **kwargs)
