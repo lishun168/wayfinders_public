@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+<div class="section">
+    <div class="title_wrapper">
+        <div class="title_bar">
+            <h3>{{member.name}}</h3>
+        </div>
+        {% if member.logo.url != None %}
+        <img src="{{member.logo.url}}" width="60" height="60" style="object-fit: contain; object-position: left top;">
+        {% endif %}
+        {% if member_admin == True or wf_admin == True %}
+        <div class="inline"><a href="/edit_group/{{member.pk}}" > <img src="{%static 'members/img/edit.png' %}" height="30" width="30"> </a></div>
+        {% endif %}
+        {% if wf_admin == True %}
+        <div class="inline"><a href="/signup/{{member.pk}}" > <img src="{%static 'members/img/plus.png' %}" height="30" width="30"> </a></div>
+        {% endif %}
+    </div>
+   
+    <div class="profile_picture">
+        {% if member.main_image.url != None %}
+        <img src="{{member.main_image.url}}" width="400" height="650" style="width: 400px; height: 650px; object-fit: contain; object-position: left top; margin-top: 5px;">
+        {% endif %}
+    </div>
+
+    <div class="profile_section">
+        <div class="subtitle">About Us:</div>
+        <div class="bio">{{member.description}}</div>
+    </div>
+
+    <div class="profile_section">
+        <div class="subtitle">Location:</div>
+        <div>{{member.address}}</div>
+        <div>{{member.city}}, {{profile.province}}, {{profile.country}}</div>
+        <div>{{member.postal_code}}</div>
+    </div>
+    <div class="profile_section">
+        <div class="subtitle">Website:</div>
+        <a href="{{member.website}}"><div>{{member.website}}</div></a>
+    </div>
+    <div class="profile_section">
+        <div class="subtitle">Business:</div>
+        <div>{{member.business_phone}}</div>
+        <div class="subtitle">Email:</div>
+        <div>{{profile.email}}</div>
+    </div>
+    
+    <div class="profile_section">
+        {% if member_admin == True %}
+        <a href="/member_skills/{{member.pk}}" > 
+            <div class="inline">
+                <div class="subtitle">Skills:</div>
+                <img src="{%static 'members/img/edit.png' %}" height="16" width="16"> 
+            </div>
+        </a>
+        {% else %}
+        <div class="inline">
+            <div class="subtitle">Skills:</div>
+        </div>
+        {% endif %}
+        {% for skill in member_skills %}
+            <div>{{skill.name}}</div>
+        {% endfor %}
+    </div>
+
+    <div class="profile_section">
+        {% if member_admin == True %}
+        <a href="/member_skills/{{member.pk}}" > 
+            <div class="inline">
+                <div class="subtitle">Industries:</div>
+                <img src="{%static 'members/img/edit.png' %}" height="16" width="16"> 
+            </div>
+        </a>
+        {% else %}
+        <div class="inline">
+            <div class="subtitle">Industries:</div>
+        </div>
+        {% endif %}
+        {% for industry in member_industries %}
+            <div>{{industry.name}}</div>
+        {% endfor %}
+    </div>
+    <div class="profile_section">
+        <div class="subtitle">Member Since: {{membership_since}}</div>
+    </div>
+</div>
+
+
+{% endblock %}
+
+{% block head %}
+    {{ block.super }}
+
+    <title>
+        Wayfinders {% block title %}{% endblock %}
+    </title>
+
+    {# favicon #}
+    <link href="#" rel="icon" type="image/x-icon" />
+
+    <style>
+
+        .profile_picture {
+            float: left;
+            width: 500px;
+            height: 650px;
+        }
+
+        .profile_section {
+            margin-bottom: 25px;
+            display: block;
+            overflow: hidden;
+        }
+
+        .inline {
+            display:inline;
+        }
+
+        .bio {
+            width: 50%;
+        }
+
+    </style>
+{% endblock %}

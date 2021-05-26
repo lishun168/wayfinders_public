@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="body-content">
-    <h1>Wayfinders Forums</h1>
+    <h1>Wayfinders Discussions</h1>
     {% if user.is_authenticated %}
     <a href="/forum/create"><button type="button" class="btn btn-primary post-button">Create Discussion</button></a>
     {% endif %}
@@ -12,7 +12,15 @@
     {% for thread in threads %}
         <a href="/forum/{{thread.pk}}"> 
             <div class="thread">
-                <div class="thread_title"> {{thread.title }}</div>
+                <div class="top-line">
+                    <div class="thread_title"> {{thread.title }}</div>
+                    <div>
+                        {% if thread.sticky == True %}
+                        <img src="{%static 'members/img/sticky_full.png' %}" width="20" height="20" style="object-fit: contain; object-position: left top; margin-top: 0px;">
+                        {% endif %}
+                    </div>
+                </div>
+                
                 <div class="thread_subtitle"> {{thread.subtitle}} </div>
             </div>
         </a>
@@ -25,6 +33,12 @@
 {% block head %}
     {{ block.super }}
     <style>
+
+        .top-line {
+            display: flex;
+            justify-content: space-between;
+            
+        }
         
         .thread {
             background: #fafafa;

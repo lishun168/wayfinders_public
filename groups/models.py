@@ -1,5 +1,5 @@
 from django.db import models
-from members.models import Member
+from members.models import MemberUser
 
 class Groups(models.Model):
     name=models.CharField(max_length=255)
@@ -17,10 +17,8 @@ class Rules(models.Model):
     name=models.CharField(max_length=255)
 
 class GroupToMember(models.Model):
-    member=models.ForeignKey(Member, on_delete=models.CASCADE)
+    member=models.ForeignKey(MemberUser, on_delete=models.CASCADE)
     group=models.ForeignKey(Groups, on_delete=models.CASCADE)
 
     def __str__(self):
         return '%s - %s' % (self.group, self.member)
-
-#many to many reference to members

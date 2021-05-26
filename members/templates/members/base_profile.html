@@ -3,19 +3,21 @@
 {% block content %}
 
     <div class="title_wrapper">
-        <div class="inline">
+        <div class="inline flex-grow">
             <div class="title_bar">
                 <a class="profile_link" href="/profile/{{profile.pk}}"><h3>{{profile.first_name}} {{profile.last_name}} - {{profile.job_title}}</h3></a>
             </div>
-            {% if my_profile == True %}
-            <div><a href="/edit_profile/{{profile.pk}}" > <img src="{%static 'members/img/edit.png' %}" height="30" width="30"> </a></div>
-            {% endif %}
-            {% if my_profile == True or calendar.public == True %}
-            <div><a href="/calendar/{{calendar.pk}}"><img src="{%static 'members/img/calendar.png' %}" height="30" width="30"></a></div>
-            {% endif %}
-            {% if my_profile == True %}
-            <div><a href="/invites/{{profile.pk}}" > <img src="{%static 'members/img/invite.png' %}" height="30" width="30"> </a></div>
-            {% endif %}
+            <div class="inline charm-bar">
+                {% if my_profile == True %}
+                <div><a href="/edit_profile/{{profile.pk}}" > <img src="{%static 'members/img/edit.png' %}" height="30" width="30"> </a></div>
+                {% endif %}
+                {% if my_profile == True or calendar.public == True %}
+                <div><a href="/calendar/{{calendar.pk}}"><img src="{%static 'members/img/calendar.png' %}" height="30" width="30"></a></div>
+                {% endif %}
+                {% if my_profile == True %}
+                <div><a href="/invites/{{profile.pk}}" > <img src="{%static 'members/img/invite.png' %}" height="30" width="30"> </a></div>
+                {% endif %}
+            </div>
         </div>
     </div>
    
@@ -77,6 +79,22 @@
 
         .bio {
             width: 50%;
+        }
+
+        .flex-grow {
+            display: flex;
+            flex: 1;
+            justify-content: space-between;
+            padding-right: 25px;
+        }
+
+        .charm-bar {
+            display: flex;
+            justify-content: space-evenly;
+        }
+
+        .charm-bar > div {
+            margin-left: 10px;
         }
 
     </style>

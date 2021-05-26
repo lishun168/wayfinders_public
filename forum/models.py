@@ -1,15 +1,15 @@
 from django.db import models
 from datetime import datetime
-from members.models import Member
+from members.models import MemberUser
 
 
-class Thread(models.Model):
+class Discussion(models.Model):
     title = models.CharField(max_length=255)
     subtitle = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True, auto_now=False)
-    created_by = models.ForeignKey(Member, on_delete=models.SET_NULL, null=True, blank=True)
+    created_by = models.ForeignKey(MemberUser, on_delete=models.SET_NULL, null=True, blank=True)
     created_by_string = models.CharField(max_length=255)
-
+    sticky = models.BooleanField(default=False)
 
     def __str__(self):
         return '%s' % (self.title)
@@ -19,9 +19,9 @@ class Thread(models.Model):
         verbose_name_plural='Discussions'
 
 class Post(models.Model):
-    thread = models.ForeignKey(Thread, on_delete=models.CASCADE)
+    discussion = models.ForeignKey(Discussion, on_delete=models.CASCADE)
     body = models.TextField()
-    created_by = models.ForeignKey(Member, on_delete=models.SET_NULL, null=True, blank=True)
+    created_by = models.ForeignKey(MemberUser, on_delete=models.SET_NULL, null=True, blank=True)
     created_by_string = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True, auto_now=False)
     edited_at = models.DateTimeField(auto_now_add=True, auto_now=False)
@@ -34,9 +34,9 @@ class Post(models.Model):
         return '%s - %s' % (self.thread, self.created_at )
 
 class Reply(models.Model):
-    thread = models.ForeignKey(Thread, on_delete=models.CASCADE)
+    thread = models.ForeignKey(Discussion, on_delete=models.CASCADE)
     body = models.TextField()
-    created_by = models.ForeignKey(Member, on_delete=models.SET_NULL, null=True, blank=True)
+    created_by = models.ForeignKey(MemberUser, on_delete=models.SET_NULL, null=True, blank=True)
     created_by_string = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True, auto_now=False)
     edited_at = models.DateTimeField(auto_now_add=True, auto_now=False)
@@ -54,7 +54,7 @@ class Reply(models.Model):
         verbose_name_plural='Replies'
 
 class MemberLikeOrFlagPost(models.Model):
-    member = models.ForeignKey(Member, on_delete=models.CASCADE)
+    member = models.ForeignKey(MemberUser, on_delete=models.CASCADE)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     flagged = models.BooleanField(default=False)
     like = models.BooleanField(default=False)
@@ -67,7 +67,7 @@ class MemberLikeOrFlagPost(models.Model):
         verbose_name_plural='Members Like Posts'
 
 class MemberLikeOrFlagReply(models.Model):
-    member = models.ForeignKey(Member, on_delete=models.CASCADE)
+    member = models.ForeignKey(MemberUser, on_delete=models.CASCADE)
     reply = models.ForeignKey(Reply, on_delete=models.CASCADE)
     flagged = models.BooleanField(default=False)
     like = models.BooleanField(default=False)

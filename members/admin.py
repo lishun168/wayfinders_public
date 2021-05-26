@@ -1,35 +1,51 @@
 from django.contrib import admin
 
-from .models import Company, Member, Skill, Role, Permissions, Industry, Gallery, MemberCompany, MemberSkills, CompanyIndustry
-from cal.models import Calendar as CalendarModel
+from .models import Application, Member
+from .models import MemberUser
+from .models import UserRole
+from .models import Permissions
+from .models import Gallery
+from skills.models import MemberToSkills
+from skills.models import UserToSkills
+from cal.models import Calendar
+from industries.models import MemberToIndustry
 
-# Member Inlines #
-class MemberCompanyAdmin(admin.TabularInline):
-    model = MemberCompany
+#class UserToMemberAdmin(admin.TabularInline):
+#    model = MemberUser
 
-class MemberSkillsAdmin(admin.TabularInline):
-    model = MemberSkills
+class UserRoleInline(admin.TabularInline):
+    model = UserRole
+
+class UserToSkillsAdmin(admin.TabularInline):
+    model = UserToSkills
 
 class CalendarInline(admin.TabularInline):
-    model = CalendarModel
+    model = Calendar
+
+class UserAdmin(admin.ModelAdmin):
+    inlines = [UserRoleInline, UserToSkillsAdmin, CalendarInline]
+
+class MemberToIndustryAdmin(admin.TabularInline):
+    model = MemberToIndustry
+
+class MemberToSkillsAdmin(admin.TabularInline):
+    model = MemberToSkills
 
 class MemberAdmin(admin.ModelAdmin):
-    inlines = [MemberCompanyAdmin, MemberSkillsAdmin, CalendarInline]
+    inlines = [MemberToIndustryAdmin, MemberToSkillsAdmin, CalendarInline]
 
-# Company Inlines #
-class CompanyIndustryAdmin(admin.TabularInline):
-    model = CompanyIndustry
+class UserRoleInline(admin.TabularInline):
+    model = UserRole
 
-class CompanyAdmin(admin.ModelAdmin):
-    inlines = [CompanyIndustryAdmin, CalendarInline]
+class PermissionsAdmin(admin.ModelAdmin):
+    inlines = [UserRoleInline]
 
 # Register Admins #
-admin.site.register(Company, CompanyAdmin)
 admin.site.register(Member, MemberAdmin)
-admin.site.register(Skill)
-admin.site.register(Role)
-admin.site.register(Permissions)
-admin.site.register(Industry)
+admin.site.register(MemberUser, UserAdmin)
+admin.site.register(UserRole)
+admin.site.register(Permissions, PermissionsAdmin)
 admin.site.register(Gallery)
+admin.site.register(Application)
 
 

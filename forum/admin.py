@@ -1,8 +1,8 @@
 from django.contrib import admin
 
-from .models import Thread, Post, Reply
+from .models import Discussion, Post, Reply
 
-admin.site.register(Thread)
+admin.site.register(Discussion)
 admin.site.register(Post)
 admin.site.register(Reply)
 

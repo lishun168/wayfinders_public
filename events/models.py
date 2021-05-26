@@ -1,19 +1,26 @@
 from django.db import models
-from members.models import Member
+from members.models import MemberUser
 from cal.models import Calendar, Filter
 from datetime import datetime
+from search.models import SearchObject
 
 class Event(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, default="")
     description = models.TextField(u'Description', blank=True, null=True)
+    location = models.TextField(u'Location', blank=True, null=True)
     calendar = models.ForeignKey(Calendar, on_delete=models.CASCADE)
     date = models.DateField(u'Day of Event', default=datetime.now)
     time = models.TimeField(u'Start Time', default=datetime.now)
     end_time = models.TimeField(u'End Time', default=datetime.now)
     sub_calendar = models.ForeignKey(Filter, on_delete=models.SET_NULL, null=True, blank=True)
     public = models.BooleanField(default=True)
-    is_open = models.BooleanField(default=False)
-    open_editing = models.BooleanField(default=False)
+    is_open = models.BooleanField(u'Open to Public', default=False)
+    open_editing = models.BooleanField(u'Public can Edit', default=False)
+    search_tag = models.ForeignKey(SearchObject, on_delete=models.SET_NULL, blank=True, null=True)
+    allow_booking = models.BooleanField(u'Allow Booking',default=False)
+    booking_interval_minutes = models.IntegerField(u'Session Length', default=30)
+    booking_interval_buffer = models.IntegerField(u'Minutes Between Sessions *optional*', default=0)
+    busy_private = models.BooleanField(default=False)
 
     def __str__(self):
         return '%s - %s' % (self.calendar, self.name)
@@ -34,7 +41,7 @@ class Event(models.Model):
         return u'<a href="%s">%s</a>' % (url, str(self.time))
 
 class Invitation(models.Model):
-    member=models.ForeignKey(Member,on_delete=models.CASCADE) #choose the member
+    member=models.ForeignKey(MemberUser,on_delete=models.CASCADE) #choose the member
     events=models.ForeignKey(Event,on_delete=models.CASCADE) #pull the id of the event
     accept=models.BooleanField(default=False)
     decline=models.BooleanField(default=False)
@@ -43,7 +50,7 @@ class Invitation(models.Model):
         return '%s - %s' % (self.events, self.member)
 
 class Participants(models.Model):
-    member=models.ForeignKey(Member,on_delete=models.CASCADE)
+    member=models.ForeignKey(MemberUser,on_delete=models.CASCADE)
     events=models.ForeignKey(Event,on_delete=models.CASCADE)
     is_administrator = models.BooleanField(default=False)
 
@@ -53,4 +60,16 @@ class Participants(models.Model):
     class Meta:
         verbose_name='Participant'
         verbose_name_plural='Participants'
+
+class GuestParticipant(models.Model):
+    events = models.ForeignKey(Event, on_delete=models.CASCADE)
+    guest_name = models.CharField(max_length=255)
+    guest_email = models.EmailField(max_length=255)
+
+    def __str__(self):
+        return '%s %s' % (self.events - self.guest_name)
+
+    class Meta:
+        verbose_name='Guest Participant'
+        verbose_name_plural='Guest Participants'
 

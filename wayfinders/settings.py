@@ -43,7 +43,10 @@ INSTALLED_APPS = [
     'cal',
     'events',
     'groups',
-    'bootstrap3_datetime',
+    'search',
+    'skills',
+    'login',
+    'industries',
     
 ]
 

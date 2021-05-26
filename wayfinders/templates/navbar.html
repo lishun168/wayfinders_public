@@ -13,13 +13,19 @@
         <div id="navbarNav" >
 
                 <div class="navbarNav-item"><a class="nav-link" href="/members">Members</a></div>
-                <div class="navbarNav-item"><a class="nav-link" href="/forum">Forums</a></div>
+                <div class="navbarNav-item"><a class="nav-link" href="/forum">Discussions</a></div>
                 {% if user.is_authenticated %}
-                <div class="navbarNav-item"><a class="nav-link" href="/logout">Logout</a></div>
-                <div class="navbarNav-item"><a class="nav-link" href="/my_profile"><img src="{%static 'members/img/account.png' %}" height="30" width="30"></a></div>
+                <div class="navbarNav-item dropbtn" onClick="profileDrop()">
+                    <img src="{%static 'members/img/account.png' %}" height="30" width="30">
+                </div>
+                <div id="profile-dropdown" class="dropdown-content dropdown-menu-right hide">
+                    <a href="/my_profile">My Profile</a>
+                    <a href="/change_password">Change Password</a>
+                    <a href="/logout">Logout</a>
+                </div>
                 {% else %}
                 <div class="navbarNav-item"><a class="nav-link" href="/login_page">Login</a></div>
-                <div class="navbarNav-item"><a class="nav-link" href="/signup">Sign Up</a></div>
+                <div class="navbarNav-item"><a class="nav-link" href="/application">Apply</a></div>
                 {% endif %}
         </div>
     </div>
@@ -74,4 +80,38 @@
         display: flex;
     }
 
+    .dropbtn {
+        cursor: pointer;
+    }
+    
+    #profile-dropdown {
+        margin-top: 210px;
+        position: absolute;
+        z-index: 1;
+        background-color: #f1f1f1;
+        min-width: 160px;
+        overflow: auto;
+        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    }
+
+    .dropdown-content a {
+        color: black;
+        padding: 12px 16px;
+        text-decoration: none;
+        display: block;
+    }
+
+    .dropdown a:hover {background-color: #ddd;}
+
+    .hide {display: none;}
+
 </style>
+
+<script>
+/* When the user clicks on the button, 
+toggle between hiding and showing the dropdown content */
+function profileDrop() {
+  document.getElementById("profile-dropdown").classList.toggle("hide");
+}
+
+</script>

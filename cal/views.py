@@ -6,22 +6,22 @@ from datetime import date
 from calendar import HTMLCalendar
 from itertools import groupby
 from .models import Calendar as CalendarModel, Filter
-from events.models import Event, Invitation, Participants
-from members.models import Member
+from events.models import Event
 from django.http import HttpResponseRedirect, HttpResponse
 from django.views.decorators import csrf
-from django.views.generic.edit import CreateView, UpdateView
-from django.forms.widgets import SelectDateWidget, TimeInput
+from django.views.generic.edit import CreateView
 from django.utils.html import conditional_escape as esc
+from login.views import LoginPermissionMixin
 
 import logging
 logger = logging.getLogger(__name__)
 
 class EventCalendar(HTMLCalendar):
 
-    def __init__(self, events):
+    def __init__(self, events, calendar):
         super(EventCalendar, self).__init__()
         self.events = self.group_by_day(events)
+        self.calendar = calendar
 
     def formatday(self, day, weekday):
         if day != 0:
@@ -31,16 +31,32 @@ class EventCalendar(HTMLCalendar):
                 cssclass += ' today'
             if day in self.events:
                 cssclass += ' filled'
-                body = ['<div>']
+                body = ['<div class="event-area">']
                 for event in self.events[day]:
-                    event_link = '/event/' + str(event.pk)
-                    event_html = '<a href=' + event_link + '>'
-                    body.append('<div>')
-                    body.append(event_html)
-                    body.append(esc(event.name))
-                    body.append('</a></div>')
+                    if event.busy_private == False and event.allow_booking == False:
+                        event_link = '/event/' + str(event.pk)
+                        event_html = '<a href=' + event_link + '>'
+                        body.append('<div>')
+                        body.append(event_html)
+                        body.append(esc(str(event.time.hour) + "-" + event.name))
+                        body.append('</a></div>')
+                    elif event.busy_private == True:
+                        body.append('<div class="busy-private">')
+                        body.append(esc("Busy " + str(event.time.hour) + 
+                        ":" + str(event.time.minute) + " - " + str(event.end_time.hour) +
+                        ":" + str(event.end_time.minute)))
+                        body.append('</div>')
+                    elif event.allow_booking == True:
+                        event_link = '/book_event/' + str(event.pk) + "/" + str(self.calendar.pk)
+                        event_html = '<a href=' + event_link + '>'
+                        body.append('<div class="allow-booking">')
+                        body.append(event_html)
+                        body.append(esc("Book time " + str(event.time.hour) + 
+                        ":" + str(event.time.minute) + " - " + str(event.end_time.hour) +
+                        ":" + str(event.end_time.minute)))
+                        body.append('</a></div>')
                 body.append('</div>')
-                return self.day_cell(cssclass, '%d %s' % (day, '<br>'.join(body)))
+                return self.day_cell(cssclass, '%d %s' % (day, '<div></div>'.join(body)))
             return self.day_cell(cssclass, day)
         return self.day_cell('noday', '&nbsp;')
 
@@ -66,7 +82,7 @@ def get_calendar_context(calendar, filt, date):
         ]
 
     events = Event.objects.filter(date__year=date.year, date__month=date.month)
-    html_c = EventCalendar(events).formatmonth(date.year, date.month)
+    html_c = EventCalendar(events, calendar).formatmonth(date.year, date.month)
     context = {
             'calendar': calendar,
             'html_calendar': mark_safe(html_c),
@@ -77,7 +93,7 @@ def get_calendar_context(calendar, filt, date):
 
     return context
 
-class Calendar(View):
+class Calendar(LoginPermissionMixin, View):
     template_name = 'cal/calendar.html'
     today = datetime.today()
 
@@ -90,7 +106,7 @@ class Calendar(View):
 
         return render(request, self.template_name, context)
 
-class CalendarDate(View):
+class CalendarDate(LoginPermissionMixin, View):
     template_name = 'cal/calendar.html'
 
     def get(self, request, pk, year, month):
@@ -103,110 +119,7 @@ class CalendarDate(View):
 
         return render(request, self.template_name, context)
 
-class CreateEvent(CreateView):
-    template_name = 'create_edit_model.html'
-    model = Event
-    fields = ('name', 'description', 'date', 'time', 'end_time', 'public', 'sub_calendar', 'is_open', 'open_editing')
-
-    def get_form(self):
-        today = datetime.today()
-        form = super(CreateEvent, self).get_form()
-        form.fields['date'].widget = SelectDateWidget()
-        form.fields['time'].widget = TimeInput(attrs={'type': 'time'})
-        form.fields['end_time'].widget = TimeInput(attrs={'type': 'time'})
-        return form
-
-    def get_context_data(self, **kwargs):
-        context = super(CreateEvent, self).get_context_data(**kwargs)
-        context['button_text'] = 'Create Event'
-        return context
-
-    def dispatch(self, *args, **kwargs):
-        return super(CreateEvent, self).dispatch(*args, **kwargs)
-
-    def form_valid(self, form):
-        obj = form.save(commit=False)
-
-        cal_pk = self.kwargs.get('pk')
-        cal = CalendarModel.objects.get(pk=cal_pk)
-
-        obj.calendar = cal  
-        obj.save() 
-
-        member = Member.objects.get(user=self.request.user)
-
-        part = Participants()
-        part.member = member
-        part.events = obj
-        part.is_administrator = True
-        part.save()
-
-        success_url = "/calendar/" + str(cal_pk)
-        return HttpResponseRedirect(success_url)
-
-class UpdateEvent(UpdateView):
-    template_name = 'create_edit_model.html'
-    model = Event
-    fields = ('name', 'description', 'date', 'time', 'end_time', 'public', 'sub_calendar', 'is_open')
-    success_url = "/"
-
-    def get_form(self):
-        today = datetime.today()
-        form = super(UpdateEvent, self).get_form()
-        form.fields['date'].widget = SelectDateWidget()
-        form.fields['time'].widget = TimeInput(attrs={'type': 'time'})
-        form.fields['end_time'].widget = TimeInput(attrs={'type': 'time'})
-        return form
-
-    def get_context_data(self, **kwargs):
-        context = super(UpdateEvent, self).get_context_data(**kwargs)
-        context['button_text'] = 'Update Event'
-        return context
-
-    def dispatch(self, *args, **kwargs):
-        return super(UpdateEvent, self).dispatch(*args, **kwargs)
-
-    def form_valid(self, form):
-        obj = form.save(commit=False)
-        event_pk = self.kwargs.get('event_pk')
-        obj.save()
-
-        success_url = "/calendar/" + str(self.object.calendar.id)
-        return HttpResponseRedirect(success_url)
-
-class ViewEvent(View):
-    template_name = 'cal/event.html'
-    
-    def get(self, request, pk):
-        eve = Event.objects.get(pk=pk)
-        invitations = Invitation.objects.filter(events=eve)
-        participants = Participants.objects.filter(events=eve)
-        member = Member.objects.get(user=request.user)
-
-        context = {
-            'event': eve,
-            'invitations': invitations,
-            'participants': participants
-        }
-
-        try:
-            my_participation = Participants.objects.get(events=eve, member=member)
-            context.update({
-                'my_part': True,
-                'admin': my_participation.is_administrator
-            })
-            return render(request, self.template_name, context)
-        except Participants.DoesNotExist:
-            context.update({
-                'my_part': False
-            })
-            return render(request, self.template_name, context)
-            
-        
-
-        
-
-class CreateFilter(CreateView):
+class CreateFilter(LoginPermissionMixin, CreateView):
     template_name = 'create_edit_model.html'
     model = Filter
     fields = ('name',)
@@ -224,7 +137,6 @@ class CreateFilter(CreateView):
         cal_pk = self.kwargs.get('pk')
         cal = CalendarModel.objects.get(pk=cal_pk)
         obj.calendar = cal
-        logger.error(obj)
         obj.save() 
 
         success_url = "/calendar/" + str(cal_pk)

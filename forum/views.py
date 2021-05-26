@@ -1,49 +1,55 @@
 from django.shortcuts import render
 from django.views import View
-from .models import Thread, Post, Reply, MemberLikeOrFlagPost, MemberLikeOrFlagReply
-from members.models import Member
+from .models import Discussion, Post, Reply, MemberLikeOrFlagPost, MemberLikeOrFlagReply
+from members.models import MemberUser
 from django.views.generic.edit import CreateView, UpdateView
 from django.http import HttpResponseRedirect, HttpResponse
 from django.views.decorators import csrf
 from django.core.paginator import Paginator
+from login.views import LoginPermissionMixin
+from django.core.exceptions import PermissionDenied
 
 import logging
 logger = logging.getLogger(__name__)
 
-class ForumDirectory(View):
+class ForumDirectory(LoginPermissionMixin, View):
     template_name='forum/forum_directory.html'
 
     def get(self, request):
-        threads = Thread.objects.all().order_by('-created_at')
+        threads = Discussion.objects.all().order_by('-sticky', '-created_at')
         context = {
             'threads': threads
         }
 
         return render(request, self.template_name, context)
 
-class ThreadPage(View):
+class ThreadPage(LoginPermissionMixin, View):
     template_name='forum/discussion.html'
 
     def get(self, request, pk):
 
         posts = Post.objects.filter(thread=pk).order_by('-created_at')
         replies = Reply.objects.filter(thread=pk).order_by('created_at')
-        thread = Thread.objects.get(pk=pk)
+        thread = Discussion.objects.get(pk=pk)
 
-        user_member = Member.objects.get(user=request.user.pk)
+        user_member = MemberUser.objects.get(user=request.user.pk)
+        like_or_flag_posts = MemberLikeOrFlagPost.objects.filter(member=user_member, post__thread=thread)
+        like_or_flag_replies = MemberLikeOrFlagReply.objects.filter(member=user_member, reply__thread=thread)
 
         context = {
             'thread': thread,
             'posts': posts,
             'replies': replies,
             'user': user_member,
+            'like_or_flag_posts': like_or_flag_posts,
+            'like_or_flag_replies': like_or_flag_replies
         }
 
         return render(request, self.template_name, context)
 
-class CreateDiscussion(CreateView):
+class CreateDiscussion(LoginPermissionMixin, CreateView):
     template_name = 'create_edit_model.html'
-    model = Thread
+    model = Discussion
     fields = ('title', 'subtitle')
     
     def get_context_data(self, **kwargs):
@@ -56,7 +62,7 @@ class CreateDiscussion(CreateView):
 
     def form_valid(self, form):
         obj = form.save(commit=False)
-        member = Member.objects.get(user=self.request.user)
+        member = MemberUser.objects.get(user=self.request.user)
         obj.created_by = member
         obj.created_by_string = member.first_name + member.last_name
         obj.save()
@@ -64,10 +70,22 @@ class CreateDiscussion(CreateView):
         success_url = '/forum/' + str(obj.pk)
         return HttpResponseRedirect(success_url)
 
-class UpdateDiscussion(UpdateView):
-    template_name = 'create_edit_models.html'
-    model = Thread
+class UpdateDiscussion(LoginPermissionMixin, UpdateView):
+    template_name = 'create_edit_model.html'
+    model = Discussion
     fields = ('title', 'subtitle')
+
+    def get_object(self, *args, **kwargs):
+        obj = super(UpdateDiscussion, self).get_object(*args, **kwargs)
+        try:
+            member = MemberUser.objects.get(user=self.request.user)
+            discussion = Discussion.objects.get(pk=self.kwargs.get('pk'))
+           
+            if member != discussion.created_by:
+                raise PermissionDenied()
+        except MemberUser.DoesNotExist:
+            raise PermissionDenied()
+        return obj
 
     def get_context_data(self, **kwargs):
         context = super(UpdateDiscussion, self).get_context_data(**kwargs)
@@ -85,7 +103,7 @@ class UpdateDiscussion(UpdateView):
         return HttpResponseRedirect(success_url)
    
 
-class CreatePost(CreateView):
+class CreatePost(LoginPermissionMixin, CreateView):
     template_name = 'create_edit_model.html'
     model = Post
     fields = ('body',)
@@ -100,21 +118,32 @@ class CreatePost(CreateView):
 
     def form_valid(self, form):
         obj = form.save(commit=False)
-        member = Member.objects.get(user=self.request.user)
+        member = MemberUser.objects.get(user=self.request.user)
         obj.created_by = member
         obj.created_by_string = member.first_name + member.last_name
         thread_pk = self.kwargs.get('pk')
       
-        thread = Thread.objects.get(pk=thread_pk)
+        thread = Discussion.objects.get(pk=thread_pk)
         obj.thread = thread
         obj.save()
         success_url = '/forum/' + str(thread_pk) 
         return HttpResponseRedirect(success_url)
 
-class UpdatePost(UpdateView):
+class UpdatePost(LoginPermissionMixin, UpdateView):
     template_name = 'create_edit_model.html'
     model = Post
     fields = ('body',)
+
+    def get_object(self, *args, **kwargs):
+        obj = super(UpdatePost, self).get_object(*args, **kwargs)
+        try:
+            member = MemberUser.objects.get(user=self.request.user)
+            post = Post.objects.get(pk=self.kwargs.get('pk'))
+            if member != post.created_by:
+                raise PermissionDenied()
+        except MemberUser.DoesNotExist:
+            raise PermissionDenied()
+        return obj
 
     def get_context_data(self, **kwargs):
         context = super(UpdatePost, self).get_context_data(**kwargs)
@@ -133,7 +162,7 @@ class UpdatePost(UpdateView):
         return HttpResponseRedirect(success_url)
     
 
-class CreateReply(CreateView):
+class CreateReply(LoginPermissionMixin, CreateView):
     template_name = 'create_edit_model.html'
     model = Reply
     fields = ('body',)
@@ -148,12 +177,12 @@ class CreateReply(CreateView):
 
     def form_valid(self, form):
         obj = form.save(commit=False)
-        member = Member.objects.get(user=self.request.user)
+        member = MemberUser.objects.get(user=self.request.user)
         obj.created_by = member
         obj.created_by_string = member.first_name + member.last_name
 
         thread_pk = self.kwargs.get('pk')
-        thread = Thread.objects.get(pk=thread_pk)
+        thread = Discussion.objects.get(pk=thread_pk)
         obj.thread = thread
 
         post_pk = self.kwargs.get('post_pk')
@@ -164,10 +193,21 @@ class CreateReply(CreateView):
         success_url = '/forum/' + str(thread_pk)
         return HttpResponseRedirect(success_url)
 
-class UpdateReply(UpdateView):
+class UpdateReply(LoginPermissionMixin, UpdateView):
     template_name = 'create_edit_model.html'
     model = Reply
     fields = ('body',)
+
+    def get_object(self, *args, **kwargs):
+        obj = super(UpdateReply, self).get_object(*args, **kwargs)
+        try:
+            member = MemberUser.objects.get(user=self.request.user)
+            reply = Reply.objects.get(pk=self.kwargs.get('pk'))
+            if member != reply.created_by:
+                raise PermissionDenied()
+        except MemberUser.DoesNotExist:
+            raise PermissionDenied()
+        return obj
 
     def get_context_data(self, **kwargs):
         context = super(UpdateReply, self).get_context_data(**kwargs)
@@ -186,68 +226,125 @@ class UpdateReply(UpdateView):
         return HttpResponseRedirect(success_url)
 
 @csrf.csrf_exempt
-def like(request):
-    member_pk = request.POST.get('member_pk')
-    post_pk = request.POST.get('post_pk')
-    post = Post.objects.get(pk=post_pk)
-    member_post = MemberLikeOrFlagPost.objects.get(member=member_pk, post=post_pk)
-    if member_post.like is True:
-        member_post.flagged = False
-        post.number_of_flags -=1
+def sticky(request, discussion_pk):
+    discussion = Discussion.objects.get(pk=discussion_pk)
+    if discussion.sticky == True:
+        discussion.sticky = False
     else:
-        member_post.flagged = True
-        post.number_of_flags += 1
-        post.flagged = True
-    post.save()
-    return HttpResponse('success')
+        discussion.sticky = True
+    discussion.save()
+    success_url = '/forum'
+    return HttpResponseRedirect(success_url)
 
 @csrf.csrf_exempt
-def like_reply(request):
-    member_pk = request.POST.get('member_pk')
-    post_pk = request.POST.get('post_pk')
+def like(request, member_pk, post_pk):
+    member = MemberUser.objects.get(pk=member_pk)
     post = Post.objects.get(pk=post_pk)
-    member_post = MemberLikeOrFlagPost.objects.get(member=member_pk, post=post_pk)
-    if member_post.like is True:
-        member_post.flagged = False
-        post.number_of_flags -=1
-    else:
-        member_post.flagged = True
-        post.number_of_flags += 1
-        post.flagged = True
-    post.save()
-    return HttpResponse('success')
+    try:
+        member_post = MemberLikeOrFlagPost.objects.get(member=member, post=post)
+        if member_post.like is True:
+            member_post.like = False
+            post.likes -=1
+        else:
+            member_post.like = True
+            post.likes += 1
+        post.save()
+        member_post.save()
+    except MemberLikeOrFlagPost.DoesNotExist:
+        member_post = MemberLikeOrFlagPost()
+        member_post.like = True
+        member_post.member = member
+        member_post.post = post
+        member_post.save()
+
+        post.likes +=1
+        post.save()
+
+    success_url = "/forum/" + str(post.thread.pk)
+    return HttpResponseRedirect(success_url)
 
 @csrf.csrf_exempt
-def flag(request):
-    member_pk = request.POST.get('member_pk')
-    post_pk = request.POST.get('post_pk')
-    post = Post.objects.get(pk=post_pk)
-    member_post = MemberLikeOrFlagPost.objects.get(member=member_pk, post=post_pk)
-    if member_post.flagged is True:
-        member_post.flagged = False
-        post.number_of_flags -=1
-    else:
-        member_post.flagged = True
-        post.number_of_flags += 1
-        post.flagged = True
-    post.save()
-    return HttpResponse('success')
-
-@csrf.csrf_exempt
-def flag_reply(request):
-    member_pk = request.POST.get('member_pk')
-    reply_pk = request.POST.get('post_pk')
+def like_reply(request, member_pk, reply_pk):
+    member = MemberUser.objects.get(pk=member_pk)
     reply = Reply.objects.get(pk=reply_pk)
-    member_reply = MemberLikeOrFlagReply.objects.get(member=member_pk, reply=reply_pk)
-    if member_reply.flagged is True:
-        member_reply.flagged = False
-        reply.number_of_flags -=1
-    else:
+    try:
+        member_reply = MemberLikeOrFlagReply.objects.get(member=member, reply=reply)
+        if member_reply.like is True:
+            member_reply.like = False
+            reply.likes -=1
+        else:
+            member_reply.like = True
+            reply.likes += 1
+        reply.save()
+        member_reply.save()
+    except MemberLikeOrFlagReply.DoesNotExist:
+        member_reply = MemberLikeOrFlagReply()
+        member_reply.like = True
+        member_reply.member = member
+        member_reply.reply = reply
+        member_reply.save()
+
+        reply.likes += 1
+        reply.save()
+
+    success_url = "/forum/" + str(reply.thread.pk)
+    return HttpResponseRedirect(success_url)
+
+@csrf.csrf_exempt
+def flag(request, member_pk, post_pk):
+    post = Post.objects.get(pk=post_pk)
+    member = MemberUser.objects.get(pk=member_pk)
+    try:
+        member_post = MemberLikeOrFlagPost.objects.get(member=member, post=post)
+        if member_post.flagged is True:
+            member_post.flagged = False
+            post.number_of_flags -=1
+        else:
+            member_post.flagged = True
+            post.number_of_flags += 1
+            post.flagged = True
+        post.save()
+        member_post.save()
+    except MemberLikeOrFlagPost.DoesNotExist:
+        member_post = MemberLikeOrFlagPost()
+        member_post.flagged = True
+        member_post.member = member
+        member_post.post = post
+        member_post.save()
+
+        post.flagged = True
+        post.number_of_flags +=1
+        post.save()
+
+    success_url = "/forum/" + str(post.thread.pk)
+    return HttpResponseRedirect(success_url)
+
+@csrf.csrf_exempt
+def flag_reply(request, member_pk, reply_pk):
+    reply = Reply.objects.get(pk=reply_pk)
+    member = MemberUser.objects.get(pk=member_pk)
+    try:
+        member_reply = MemberLikeOrFlagReply.objects.get(member=member, reply=reply)
+        if member_reply.flagged is True:
+            member_reply.flagged = False
+            reply.number_of_flags -=1
+        else:
+            member_reply.flagged = True
+            reply.number_of_flags += 1
+            reply.flagged = True
+        reply.save()
+        member_reply.save()
+    except MemberLikeOrFlagPost.DoesNotExist:
+        member_reply = MemberLikeOrFlagPost()
         member_reply.flagged = True
-        reply.number_of_flags += 1
+        member_reply.member = member
+        member_reply.reply = reply
+        member_reply.save()
+
         reply.flagged = True
-    post.save()
-    return HttpResponse('success')
+        reply.number_of_flags +=1
+        reply.save()
 
-
+    success_url = "/forum/" + str(reply.thread.pk)
+    return HttpResponseRedirect(success_url)
 

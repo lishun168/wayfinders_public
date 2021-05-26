@@ -12,11 +12,11 @@
           <button id="search-button" class="button-search btn btn-outline-secondary" type="button">Search</button>
         </div>
     </div>
-
+    {% if query %}
+    <h3>Search results for {{ query }}...</h3>
+    {% endif %}
     {% for member in members %}
-        {% if member.publicly_viewable == True %}
-        <a href="/profile/{{member.pk}}"> <div> {{member.last_name }}, {{member.first_name}}  - {{member.job_title}}</div></a>
-        {% endif %}
+        <a href="/member/{{member.pk}}"> <div> {{member.name}}</div></a>
 {% endfor %}
 </div>
 

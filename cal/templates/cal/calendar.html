@@ -22,7 +22,9 @@
             </div>
             <div class="buttons">
                 <div> <a href="/create_event/{{calendar.pk}}"><button class="bnt btn-primary">Create Event</button></a></div>
-                <div> <a href="/create_filter/{{calendar.pk}}"><button class="bnt btn-primary">Create Sub</button></a></div>
+                <div> <a href="/create_booking/{{calendar.pk}}"><button class="bnt btn-primary">Create Booking</button></a></div>
+                <div> <a href="/mark_busy/{{calendar.pk}}"><button class="bnt btn-primary">Mark Busy</button></a></div>
+                <div> <a href="/create_filter/{{calendar.pk}}"><button class="bnt btn-primary">Create Calendar</button></a></div>
             </div>  
         </div>
         <div>
@@ -109,6 +111,7 @@
             padding: 4px;
             height: 175px;
             width: 175px;
+            border: 1px solid #888;
         }
 
         .month {
@@ -178,6 +181,25 @@
         }
 
         #date-input {
+        }
+
+        .event-area {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+
+        .event-area > div {
+            align-self: flex-start;
+            width: 100%;
+        }
+
+        .busy-private {
+            background-color: lightpink;
+        }
+
+        .allow-booking {
+            background-color: lightgrey;
         }
 
     </style>
