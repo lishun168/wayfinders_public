@@ -3,7 +3,6 @@ from django.db.models import Q
 from django.views import View
 from django.views.generic.edit import UpdateView
 from django.views.generic.edit import CreateView
-from django.contrib.auth.forms import UserCreationForm
 from django.contrib import auth
 from django.contrib.auth.models import User
 from login.views import LoginPermissionMixin
@@ -14,6 +13,7 @@ from django.utils import timezone
 from django.contrib.auth.views import PasswordChangeView
 from django.contrib.auth.forms import PasswordChangeForm
 from .forms import ApplicationForm
+from .forms import SignUpForm
 
 ##           MODELS             ##
 from .models import MemberUser
@@ -50,25 +50,38 @@ class UserProfile(LoginPermissionMixin, View):
     template_name = 'members/profile.html'
 
     def get(self, request, pk):
-        my_profile = False
         user = MemberUser.objects.get(pk=pk)
         calendar = Calendar.objects.get(user=user)
         memberskills = MemberToSkills.objects.filter(member=pk)
         user_role = UserRole.objects.get(user=user)
+        context = {
+            'profile': user,
+            'member_skills': memberskills,
+            'user_role': user_role,
+            'calendar': calendar
+        }
 
         if request.user is not None:
             mId = request.user.pk
             user_member = MemberUser.objects.get(user=mId)
             if(user_member.pk == user.pk):
-                my_profile = True
+                context['my_profile'] = True
+            else:
+                context['my_profile'] = False
 
-        context = {
-            'profile': user,
-            'member_skills': memberskills,
-            'user_role': user_role,
-            'my_profile': my_profile,
-            'calendar': calendar
-        }
+            active_user = MemberUser.objects.get(user=request.user)
+            if(active_user.is_wf_admin and active_user.member == user.member):
+                context['admin'] = True
+            else:
+                context['admin'] = False
+
+            if(request.user.is_superuser):
+                context['admin'] = True
+            else:
+                context['admin'] = False
+
+
+        
         return render(request, self.template_name, context)
 
 class EditUser(LoginPermissionMixin, UpdateView):
@@ -88,19 +101,22 @@ class EditUser(LoginPermissionMixin, UpdateView):
         'home_phone',
         'cell_phone',
         'email',
-        'bio',
         'main_image'
         )
 
     def get_object(self, *args, **kwargs):
         obj = super(EditUser, self).get_object(*args, **kwargs)
         try:
-            member = MemberUser.objects.get(user=self.request.user)
-            if member.pk != self.kwargs.get('pk'):
-                raise PermissionDenied()
+            user = MemberUser.objects.get(user=self.request.user)
+            admin_user = False
+            active_user = MemberUser.objects.get(user=self.request.user)
+            if active_user.is_wf_admin and active_user.member == user.member:
+                admin_user = True  
+            if user.pk == self.kwargs.get('pk') or self.request.user.is_superuser or admin_user:
+                return obj
         except MemberUser.DoesNotExist:
             raise PermissionDenied()
-        return obj
+        raise PermissionDenied()
 
     def get_context_data(self, **kwargs):
         context = super(EditUser, self).get_context_data(**kwargs)
@@ -236,11 +252,13 @@ class MemberView(View):
         member = Member.objects.get(pk=pk)
         member_skills = MemberToSkills.objects.filter(member=member)
         member_industries = MemberToIndustry.objects.filter(member=member)
+        member_user_list = MemberUser.objects.filter(member=member)
 
         context = {
             'member': member,
             'member_skills': member_skills,
-            'member_industries': member_industries
+            'member_industries': member_industries,
+            'member_user_list': member_user_list
         }
 
         if request.user.is_authenticated == True:
@@ -289,16 +307,6 @@ class Invites(LoginPermissionMixin, View):
 
         return render(request, self.template_name, context)
 
-class SignUpForm(WFAdminPermissionMixin, UserCreationForm):
-    
-    class Meta:
-        model = User
-        fields = ('username', 'password1', 'password2')
-
-    def __init__(self, *args, **kwargs):
-        super(SignUpForm, self).__init__(*args, **kwargs)
-
-
 class SignUp(WFAdminPermissionMixin, CreateView):
     template_name = 'members/signup.html'
     form_class = SignUpForm
@@ -317,6 +325,7 @@ class SignUp(WFAdminPermissionMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super(SignUp, self).get_context_data(**kwargs)
+        context['member_list'] = Member.objects.filter(pk=self.kwargs.get('pk'))
         context['button_text'] = 'Create Member'
         return context
 
@@ -325,15 +334,34 @@ class SignUp(WFAdminPermissionMixin, CreateView):
 
     def form_valid(self, form):
         obj = form.save(commit=False)
-        
+        obj.save()
 
         member_pk = self.kwargs.get('pk')
         member = Member.objects.get(pk=member_pk)
 
-        obj.member = member
-        obj.save()
+        member_user = MemberUser()
+        member_user.first_name = form.cleaned_data['first_name']
+        member_user.last_name = form.cleaned_data['last_name']
+        member_user.member = member
+        member_user.user = obj
+        member_user.email = form.cleaned_data['email']
+        member_user.save()
 
-        success_url = '/signup/' + str(member_pk)
+        calendar = Calendar()
+        calendar.user = member_user
+        calendar.name = member_user.first_name + member_user.last_name + "s Calendar"
+        calendar.save()
+
+        permissions = Permissions()
+        permissions.title = "New Permissions"
+        permissions.save()
+
+        user_role = UserRole()
+        user_role.user = member_user
+        user_role.permissions = permissions
+        user_role.save()
+
+        success_url = '/member/' + str(member_pk)
         return HttpResponseRedirect(success_url)
 
 class Approval(View):
@@ -375,6 +403,7 @@ class Application(View):
             application.save()
 
             return HttpResponseRedirect('/submission')
+        return render(request, self.template_name, {'form': form})
 
 
 class ApplicationSubmission(View):

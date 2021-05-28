@@ -11,28 +11,33 @@
             <div class="subtitle">Member:</div>
             <div><a href="/member/{{profile.member.pk}}">{{profile.member}}</a></div>
         </div>
+        {% if my_profile or admin%}
         <div class="profile_section">
             <div class="subtitle">Location:</div>
             <div>{{profile.address}}</div>
             <div>{{profile.city}}, {{profile.province}}, {{profile.country}}</div>
             <div>{{profile.postal_code}}</div>
         </div>
+        {% endif %}
+
         <div class="profile_section">
             <div class="subtitle">Business:</div>
             <div>{{profile.business_phone}}</div>
-            {% if profile.home_phone != None %}
-            <div class="subtitle">Home:</div>
-            <div>{{profile.home_phone}}</div>
-            {% endif %}
-            {% if profile.cell_phone != None %}
-            <div class="subtitle">Cell:</div>
-            <div>{{profile.cell_phone}}</div>
+            {% if my_profile or admin%}
+                {% if profile.home_phone != None %}
+                <div class="subtitle">Home:</div>
+                <div>{{profile.home_phone}}</div>
+                {% endif %}
+                {% if profile.cell_phone != None %}
+                <div class="subtitle">Cell:</div>
+                <div>{{profile.cell_phone}}</div>
+                {% endif %}
             {% endif %}
             <div class="subtitle">Email:</div>
             <div>{{profile.email}}</div>
         </div>
         <div class="profile_section">
-            {% if my_profile == True %}
+            {% if my_profile or admin%}
             <a href="/my_groups/{{profile.pk}}" > 
                 <div class="inline">
                     <div class="subtitle">Groups:</div>
@@ -55,7 +60,7 @@
             {% endfor %}
         </div>
         <div class="profile_section">
-            {% if my_profile == True %}
+            {% if my_profile or admin%}
             <a href="/my_skills/{{profile.pk}}" > 
                 <div class="inline">
                     <div class="subtitle">Skills:</div>

@@ -5,19 +5,37 @@
 {% block content %}
 
 <div class="section">
-    <div class="title_wrapper">
-        <div class="title_bar">
-            <h3>{{member.name}}</h3>
+    {% if form.errors %}
+    {% for field in form %}
+        {% for error in field.errors %}
+            <div class="alert alert-danger">
+                <strong>{{ error|escape }}</strong>
+            </div>
+        {% endfor %}
+    {% endfor %}
+    {% for error in form.non_field_errors %}
+        <div class="alert alert-danger">
+            <strong>{{ error|escape }}</strong>
         </div>
-        {% if member.logo.url != None %}
-        <img src="{{member.logo.url}}" width="60" height="60" style="object-fit: contain; object-position: left top;">
-        {% endif %}
-        {% if member_admin == True or wf_admin == True %}
-        <div class="inline"><a href="/edit_group/{{member.pk}}" > <img src="{%static 'members/img/edit.png' %}" height="30" width="30"> </a></div>
-        {% endif %}
-        {% if wf_admin == True %}
-        <div class="inline"><a href="/signup/{{member.pk}}" > <img src="{%static 'members/img/plus.png' %}" height="30" width="30"> </a></div>
-        {% endif %}
+    {% endfor %}
+{% endif %}
+    <div class="title_wrapper">
+        <div class="inline flex-grow">
+            <div class="title_bar">
+                <h3>{{member.name}}</h3>
+            </div>
+            <div class="inline charm-bar">
+                {% if member.logo.url != None %}
+                <img src="{{member.logo.url}}" width="60" height="60" style="object-fit: contain; object-position: left top;">
+                {% endif %}
+                {% if member_admin == True or wf_admin == True %}
+                <div class="inline"><a href="/edit_group/{{member.pk}}" > <img src="{%static 'members/img/edit.png' %}" height="30" width="30"> </a></div>
+                {% endif %}
+                {% if wf_admin == True %}
+                <div class="inline"><a href="/signup/{{member.pk}}" > <img src="{%static 'members/img/plus.png' %}" height="30" width="30"> </a></div>
+                {% endif %}
+            </div>
+        </div>
     </div>
    
     <div class="profile_picture">
@@ -86,6 +104,15 @@
     <div class="profile_section">
         <div class="subtitle">Member Since: {{membership_since}}</div>
     </div>
+    {% if member_of %}
+    <div class="profile_section">
+        {% for member in member_user_list %}
+            <a href="/profile/{{member.pk}}">
+                <div>{{member.first_name}} {{member.last_name}}</div>
+            </a>
+        {% endfor %}
+    </div>
+    {% endif %}
 </div>
 
 
@@ -121,6 +148,13 @@
 
         .bio {
             width: 50%;
+        }
+
+        .flex-grow {
+            display: flex;
+            flex: 1;
+            justify-content: space-between;
+            padding-right: 25px;
         }
 
     </style>
