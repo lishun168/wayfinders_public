@@ -30,7 +30,7 @@ class Member(models.Model):
 
 class MemberUser(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    member = models.ForeignKey(Member, on_delete=models.CASCADE)
+    primary_member = models.ForeignKey(Member, on_delete=models.CASCADE)
     search_tag = models.ForeignKey(SearchObject, on_delete=models.SET_NULL, blank=True, null=True)
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
@@ -61,17 +61,31 @@ class MemberUser(models.Model):
         verbose_name='Member User'
         verbose_name_plural='Member Users'
 
+class UserToMember(models.Model):
+    member_user = models.ForeignKey(MemberUser, on_delete=models.CASCADE)
+    member = models.ForeignKey(Member, on_delete=models.CASCADE)
+    is_owner = models.BooleanField(default=False)
+
+    def __str__(self):
+        return '%s %s' % (self.member_user, self.member)
+
+    class Meta:
+        unique_together=("member_user", "member")
+        verbose_name="Member To User Relationship"
+        verbose_name_plural="Member to User Relationships"
+
 class Permissions(models.Model):
-    title = models.CharField(max_length=255)
+    role_title = models.CharField(max_length=255)
     is_member_admin = models.BooleanField(default=False)
     can_add_calendar_events = models.BooleanField(default=False)
     can_edit_company_profile = models.BooleanField(default=False)
     can_add_employees = models.BooleanField(default=False)
     can_delete_posts = models.BooleanField(default=False)
     can_edit_own_profile = models.BooleanField(default=True)
+    member = models.ForeignKey(Member, on_delete=models.CASCADE)
 
     def __str__(self):
-        return '%s' % (self.title)
+        return '%s' % (self.role_title)
 
     class Meta:
         verbose_name='Permission'
@@ -79,10 +93,16 @@ class Permissions(models.Model):
 
 class UserRole(models.Model):
     user = models.ForeignKey(MemberUser, on_delete=models.CASCADE)
+    member = models.ForeignKey(Member, on_delete=models.CASCADE)
     permissions = models.ForeignKey(Permissions, on_delete=models.CASCADE)
 
     def __str__(self):
         return '%s - %s' % (self.user, self.permissions)
+
+    class Meta:
+        unique_together=("user", "member")
+        verbose_name="User Role"
+        verbose_name_plural="User Roles"
 
 class Gallery(models.Model):
     member = models.ForeignKey(Member, on_delete=models.CASCADE)

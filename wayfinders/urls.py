@@ -26,10 +26,19 @@ from members.views import CreateMemberProfile, UpdatePassword
 from members.views import Index
 from members.views import UserProfile 
 from members.views import MemberView
+from members.views import EditMember
+from members.views import EditMembersList
 from members.views import MembersDirectory
 from members.views import DirectorySearch
 from members.views import MyProfile
 from members.views import EditUser
+from members.views import PermissionsView
+from members.views import CreatePermissions
+from members.views import EditPermissions
+from members.views import Roles
+from members.views import AssignRoles
+from members.views import UpdateRoles
+from members.views import RolesEditAll
 from members.views import Invites
 from members.views import SignUp
 from members.views import CreateUser
@@ -80,6 +89,18 @@ urlpatterns = [
     path('member/<int:pk>', MemberView.as_view()),
     path('pending_approval', Approval.as_view()),
     path('create_profile/', CreateMemberProfile.as_view()),
+    path('edit_member/<int:pk>', EditMember.as_view()),
+    path('edit_member_list/<int:pk>', EditMembersList.as_view()),
+
+    path('permissions/<int:pk>', PermissionsView.as_view()),
+    path('create_permissions/<int:member_pk>/', CreatePermissions.as_view()),
+    path('edit_permissions/<int:pk>/<int:member_pk>/', EditPermissions.as_view()),
+
+    path('roles/<int:pk>', Roles.as_view()),
+    path('create_role/<int:member_pk>', AssignRoles.as_view()),
+    path('edit_role/<int:pk>/<int:member_pk>/', UpdateRoles.as_view()),
+    path('edit_all_roles/<int:pk>/', RolesEditAll.as_view()),
+    #Update Many    
 
     path('application/', Application.as_view()),
     path('submission/', ApplicationSubmission.as_view()),

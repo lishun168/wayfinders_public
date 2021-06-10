@@ -34,7 +34,7 @@ class Post(models.Model):
         return '%s - %s' % (self.thread, self.created_at )
 
 class Reply(models.Model):
-    thread = models.ForeignKey(Discussion, on_delete=models.CASCADE)
+    discussion = models.ForeignKey(Discussion, on_delete=models.CASCADE)
     body = models.TextField()
     created_by = models.ForeignKey(MemberUser, on_delete=models.SET_NULL, null=True, blank=True)
     created_by_string = models.CharField(max_length=255)

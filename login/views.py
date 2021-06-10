@@ -4,6 +4,7 @@ from django.http import HttpResponseRedirect
 from members.models import MemberUser
 from django.contrib.auth.views import LoginView
 from django.contrib.messages.views import SuccessMessageMixin
+from django.contrib import messages
 from cal.models import Calendar
 
 class LoginPermissionMixin(object):
@@ -63,8 +64,8 @@ def login_view(request):
         except MemberUser.DoesNotExist:
             return HttpResponseRedirect("/create_profile")
     else:
-        message = 'The username or password is incorrect'
-        return render(request, 'login/login_failed.html', {'message': message})
+        messages.add_message(request, messages.ERROR, "Your username and/or password is incorrect.")
+        return HttpResponseRedirect('/login_page')
 
 
 

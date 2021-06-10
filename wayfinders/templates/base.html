@@ -104,12 +104,6 @@
             width: 100%;
         }
 
-        .subtitle {
-            color:  #398677;
-            font-weight: bold;
-            margin-right: 5px;
-        }
-
         .button-row {
             display: flex;
             flex-direction: row;
@@ -154,6 +148,17 @@
         .charm-bar > div {
             margin-left: 10px;
         }
+
+        .error {
+            color: red;
+        }
+
+        .button_container {
+            padding: 25px;
+            display: flex;
+            justify-content: center;
+        }
+
     </style>
 {% endblock %}
 
@@ -164,20 +169,13 @@
 
     {% block full_content %}{% endblock %}
 
-    <div class="container-fluid body-container">
-        <div class="col-10 ml-auto">
-            {% if messages %}
+         {% if messages %}
+            <div class="section">
                 {% for message in messages %}
-                   <div class="row justify-content-end">
-                      <div class="col-4 text-center">
-                          <div class="alert alert-{{message.tags}}">
-                                  {{ message }}
-                          </div>
-                       </div>
-                    </div>
-                 {% endfor %}
-            {% endif%}
-         </div>
+                    <div {% if message.tags %} class="{{message.tags}}">{% endif %} {{ message }} </div>
+                {% endfor %}
+            </div>
+         {% endif %}
          
         {% block content %}{% endblock %}
     </div>

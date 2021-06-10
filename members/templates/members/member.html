@@ -28,11 +28,17 @@
                 {% if member.logo.url != None %}
                 <img src="{{member.logo.url}}" width="60" height="60" style="object-fit: contain; object-position: left top;">
                 {% endif %}
-                {% if member_admin == True or wf_admin == True %}
-                <div class="inline"><a href="/edit_group/{{member.pk}}" > <img src="{%static 'members/img/edit.png' %}" height="30" width="30"> </a></div>
+                {% if member_admin or is_owner %}
+                <div class="inline"><a href="/edit_member/{{member.pk}}" > <img src="{%static 'members/img/edit.png' %}" height="30" width="30"> </a></div>
                 {% endif %}
-                {% if wf_admin == True %}
+                {% if is_owner or member_admin %}
                 <div class="inline"><a href="/signup/{{member.pk}}" > <img src="{%static 'members/img/plus.png' %}" height="30" width="30"> </a></div>
+                {% endif %}
+                {% if is_owner or member_admin%}
+                <div class="inline"><a href="/permissions/{{member.pk}}" > <img src="{%static 'members/img/permissions.png' %}" height="30" width="30"> </a></div>
+                {% endif %}
+                {% if is_owner or member_admin%}
+                <div class="inline"><a href="/roles/{{member.pk}}" > <img src="{%static 'members/img/account_management.png' %}" height="30" width="30"> </a></div>
                 {% endif %}
             </div>
         </div>
@@ -67,7 +73,7 @@
     </div>
     
     <div class="profile_section">
-        {% if member_admin == True %}
+        {% if member_admin or is_owner %}
         <a href="/member_skills/{{member.pk}}" > 
             <div class="inline">
                 <div class="subtitle">Skills:</div>
@@ -85,7 +91,7 @@
     </div>
 
     <div class="profile_section">
-        {% if member_admin == True %}
+        {% if member_admin or is_owner %}
         <a href="/member_skills/{{member.pk}}" > 
             <div class="inline">
                 <div class="subtitle">Industries:</div>
@@ -102,13 +108,20 @@
         {% endfor %}
     </div>
     <div class="profile_section">
-        <div class="subtitle">Member Since: {{membership_since}}</div>
+        <div class="subtitle">Member Since: </div>
+        <div>{{member.membership_since}}</div>
     </div>
     {% if member_of %}
     <div class="profile_section">
-        {% for member in member_user_list %}
-            <a href="/profile/{{member.pk}}">
-                <div>{{member.first_name}} {{member.last_name}}</div>
+        <div class="subtitle">Members: </div>
+        {% if member_admin or is_owner %}
+        <a href="/edit_member_list/{{member.pk}}" > 
+                <img src="{%static 'members/img/edit.png' %}" height="16" width="16"> 
+        </a>
+        {% endif %}
+        {% for list_member in member_user_list %}
+            <a href="/profile/{{list_member.member_user.pk}}">
+                <div>{{list_member.member_user.first_name}} {{list_member.member_user.last_name}}</div>
             </a>
         {% endfor %}
     </div>

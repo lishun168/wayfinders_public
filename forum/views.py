@@ -28,13 +28,13 @@ class ThreadPage(LoginPermissionMixin, View):
 
     def get(self, request, pk):
 
-        posts = Post.objects.filter(thread=pk).order_by('-created_at')
-        replies = Reply.objects.filter(thread=pk).order_by('created_at')
+        posts = Post.objects.filter(discussion=pk).order_by('-created_at')
+        replies = Reply.objects.filter(discussion=pk).order_by('created_at')
         thread = Discussion.objects.get(pk=pk)
 
         user_member = MemberUser.objects.get(user=request.user.pk)
-        like_or_flag_posts = MemberLikeOrFlagPost.objects.filter(member=user_member, post__thread=thread)
-        like_or_flag_replies = MemberLikeOrFlagReply.objects.filter(member=user_member, reply__thread=thread)
+        like_or_flag_posts = MemberLikeOrFlagPost.objects.filter(member=user_member, post__discussion=thread)
+        like_or_flag_replies = MemberLikeOrFlagReply.objects.filter(member=user_member, reply__discussion=thread)
 
         context = {
             'thread': thread,
@@ -121,12 +121,12 @@ class CreatePost(LoginPermissionMixin, CreateView):
         member = MemberUser.objects.get(user=self.request.user)
         obj.created_by = member
         obj.created_by_string = member.first_name + member.last_name
-        thread_pk = self.kwargs.get('pk')
+        discussion_pk = self.kwargs.get('pk')
       
-        thread = Discussion.objects.get(pk=thread_pk)
-        obj.thread = thread
+        discussion = Discussion.objects.get(pk=discussion_pk)
+        obj.discussion = discussion
         obj.save()
-        success_url = '/forum/' + str(thread_pk) 
+        success_url = '/forum/' + str(discussion_pk) 
         return HttpResponseRedirect(success_url)
 
 class UpdatePost(LoginPermissionMixin, UpdateView):

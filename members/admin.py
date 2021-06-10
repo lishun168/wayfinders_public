@@ -5,13 +5,14 @@ from .models import MemberUser
 from .models import UserRole
 from .models import Permissions
 from .models import Gallery
+from .models import UserToMember
 from skills.models import MemberToSkills
 from skills.models import UserToSkills
 from cal.models import Calendar
 from industries.models import MemberToIndustry
 
-#class UserToMemberAdmin(admin.TabularInline):
-#    model = MemberUser
+class UserToMemberInline(admin.TabularInline):
+    model = UserToMember
 
 class UserRoleInline(admin.TabularInline):
     model = UserRole
@@ -23,7 +24,7 @@ class CalendarInline(admin.TabularInline):
     model = Calendar
 
 class UserAdmin(admin.ModelAdmin):
-    inlines = [UserRoleInline, UserToSkillsAdmin, CalendarInline]
+    inlines = [UserToMemberInline, UserRoleInline, UserToSkillsAdmin, CalendarInline]
 
 class MemberToIndustryAdmin(admin.TabularInline):
     model = MemberToIndustry
@@ -42,6 +43,7 @@ class PermissionsAdmin(admin.ModelAdmin):
 
 # Register Admins #
 admin.site.register(Member, MemberAdmin)
+admin.site.register(UserToMember)
 admin.site.register(MemberUser, UserAdmin)
 admin.site.register(UserRole)
 admin.site.register(Permissions, PermissionsAdmin)

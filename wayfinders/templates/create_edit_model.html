@@ -4,6 +4,7 @@
 
 {% block content %}
 <div class="section">
+    <h1 class="title">{{title}}</h1>
     <form class="m_form" method="post" enctype="multipart/form-data">{% csrf_token %}
         <table>
             {{form}}
@@ -51,6 +52,11 @@
         }
 
         .profile_section {
+            margin-bottom: 25px;
+        }
+
+        .title {
+            margin-left: 10px;
             margin-bottom: 25px;
         }
 
