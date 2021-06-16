@@ -49,5 +49,6 @@ admin.site.register(UserRole)
 admin.site.register(Permissions, PermissionsAdmin)
 admin.site.register(Gallery)
 admin.site.register(Application)
+#admin.site.register(FileUploadApplication)
 
 

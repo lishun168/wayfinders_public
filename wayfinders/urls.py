@@ -63,6 +63,7 @@ from forum.views import CreateReply
 from forum.views import UpdateReply
 from cal.views import Calendar
 from cal.views import CreateFilter
+from cal.views import MyCalendar
 from cal.views import CalendarDate
 from events.views import CreateInvitation
 from events.views import Invite
@@ -128,6 +129,7 @@ urlpatterns = [
     path('calendar/<int:pk>', Calendar.as_view()),
     path('calendar/<int:pk>/<int:year>/<int:month>', CalendarDate.as_view()),
     path('create_filter/<int:pk>', CreateFilter.as_view()),
+    path('my_calendar/', MyCalendar.as_view()),
 
     ## EVENT APP ##
     path('edit_event/<int:pk>', UpdateEvent.as_view()),

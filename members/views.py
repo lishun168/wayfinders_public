@@ -711,11 +711,13 @@ class Application(View):
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)
         if form.is_valid():
+            # add field = form.cleaned_data['field_name']
             name = form.cleaned_data['name']
             email = form.cleaned_data['email']
             organization_name = form.cleaned_data['organization_name']
             organization_email = form.cleaned_data['organization_email']
 
+            #application.field_name = field_name
             application = ApplicationModel()
             application.name = name
             application.email = email

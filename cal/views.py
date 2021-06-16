@@ -5,7 +5,8 @@ from django.views import View
 from datetime import date
 from calendar import HTMLCalendar
 from itertools import groupby
-from .models import Calendar as CalendarModel, Filter
+from .models import Calendar as CalendarModel
+from .models import Filter
 from events.models import Event
 from django.http import HttpResponseRedirect, HttpResponse
 from django.views.decorators import csrf
@@ -15,6 +16,14 @@ from login.views import LoginPermissionMixin
 
 import logging
 logger = logging.getLogger(__name__)
+
+class MyCalendar(LoginPermissionMixin, View):
+    def get(self, request):
+        calendar = CalendarModel.objects.get(user__user=request.user.pk)
+        id = calendar.pk
+        
+        address = '/calendar/' + str(id)
+        return HttpResponseRedirect(address)
 
 class EventCalendar(HTMLCalendar):
 
@@ -73,7 +82,7 @@ class EventCalendar(HTMLCalendar):
     def day_cell(self, cssclass, body):
         return '<td class="%s">%s</td>' % (cssclass, body)
 
-def get_calendar_context(calendar, filt, date):
+def get_calendar_context(calendar, filter, filter_params, date):
     times = [
             "12 AM", "1 AM", "2 AM", "3 AM", "4 AM", "5 AM",
             "6 AM", "7 AM", "8 AM", "9 AM", "10 AM", "11 AM",
@@ -81,16 +90,25 @@ def get_calendar_context(calendar, filt, date):
             "6 PM", "7 PM", "8 PM", "9 PM", "10 PM", "11 PM"
         ]
 
-    events = Event.objects.filter(date__year=date.year, date__month=date.month)
-    html_c = EventCalendar(events, calendar).formatmonth(date.year, date.month)
     context = {
             'calendar': calendar,
-            'html_calendar': mark_safe(html_c),
             'times': times,
-            'filters': filt,
+            'filters': filter,
             'date_object': date
-    }   
+    }  
 
+    if filter_params == []:
+        events = Event.objects.filter(date__year=date.year, date__month=date.month, calendar=calendar)
+        html_c = EventCalendar(events, calendar).formatmonth(date.year, date.month)
+        context['html_calendar'] = mark_safe(html_c)
+    else:
+        for i in range(0, len(filter_params)):
+            filter_params[i] = int(filter_params[i])
+        events = Event.objects.filter(date__year=date.year, date__month=date.month, calendar=calendar, sub_calendar__in=filter_params)
+        logger.error(events)
+        html_c = EventCalendar(events, calendar).formatmonth(date.year, date.month)
+        context['html_calendar'] = mark_safe(html_c)
+    
     return context
 
 class Calendar(LoginPermissionMixin, View):
@@ -99,10 +117,11 @@ class Calendar(LoginPermissionMixin, View):
 
     def get(self, request, pk):
 
-        c = CalendarModel.objects.get(pk=pk)
-        f = Filter.objects.filter(calendar=c)
+        calendar = CalendarModel.objects.get(pk=pk)
+        filters = Filter.objects.filter(calendar=calendar)
+        filter_params = request.GET.getlist('filters')
         today = datetime.today()
-        context = get_calendar_context(c, f, today)
+        context = get_calendar_context(calendar, filters, filter_params, today)
 
         return render(request, self.template_name, context)
 

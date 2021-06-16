@@ -12,7 +12,7 @@ class Event(models.Model):
     date = models.DateField(u'Day of Event', default=datetime.now)
     time = models.TimeField(u'Start Time', default=datetime.now)
     end_time = models.TimeField(u'End Time', default=datetime.now)
-    sub_calendar = models.ForeignKey(Filter, on_delete=models.SET_NULL, null=True, blank=True)
+    sub_calendar = models.ForeignKey(Filter, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Calendar")
     public = models.BooleanField(default=True)
     is_open = models.BooleanField(u'Open to Public', default=False)
     open_editing = models.BooleanField(u'Public can Edit', default=False)

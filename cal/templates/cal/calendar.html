@@ -34,7 +34,7 @@
                 <span class="checkmark"></span>
               </label>
             {% endfor %}
-            <div> <a href="/calendar/{{calendar.pk}}"><button class="bnt btn-primary filter-button">Select Calendar Views</button></a></div>
+            <div> <button class="bnt btn-primary filter-button">Select Calendars</button></div>
         </div>
         
         
@@ -219,7 +219,32 @@
             });
 
             $('.filter-button').click(function(event){
-                
+                const currentURL = window.location.pathname;
+                const URLValues = currentURL.split("/");
+                const id = URLValues[2];
+                let url = "/calendar/" + id + "?";
+
+                let filter_added = false;
+
+                $(".filter-container").each(function(index) {
+                    var id = $(this).attr('data-id');
+                    var checkbox = $(this).find('input');
+                    var checked = checkbox.prop('checked');
+                    if(checked){
+                        if(filter_added){
+                            url += "&";
+                        }else{
+                            filter_added = true;
+                        } 
+                        url += 'filters=' + id;
+                        
+                    }
+                });
+
+                if(filter_added === false){
+                    url = url.slice(0, -2);
+                }
+                location.href = url;
             })
         })
         
