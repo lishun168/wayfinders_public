@@ -9,7 +9,14 @@
     <div class="calendar-header">
         <div class="calendar-title">
             <h3>
-            {{calendar.name}} - {{ date_object|date:"F" }} {{ date_object.year }}
+            {% if member_calendar %}
+               <div>  <a href="/member/{{calendar.member.pk}}">{{calendar.member.name}} </a> - {{ date_object|date:"F" }} {{ date_object.year }} </div>
+            {% elif user_calendar %}
+                <div><a href="/profile/{{calendar.user.pk}}"> {{calendar.user.first_name}} {{calendar.user.last_name}} </a> - {{ date_object|date:"F" }} {{ date_object.year }} </div>
+            {% else %}
+                {{calendar.name}} - {{ date_object|date:"F" }} {{ date_object.year }}
+            {% endif %}
+             
             </h3>
             <div class="datepicker-section">
                 <div class="form-group datep">
@@ -27,14 +34,25 @@
                 <div> <a href="/create_filter/{{calendar.pk}}"><button class="bnt btn-primary">Create Calendar</button></a></div>
             </div>  
         </div>
-        <div>
-            {% for filter in filters %}
-            <label data-id="{{filter.id}}" class="container filter-container">{{filter.name}}
-                <input type="checkbox" checked="checked">
-                <span class="checkmark"></span>
-              </label>
+        <div class="header-column">
+            <div class="subtitle">Upcoming Events:</div>
+            {% for event in upcoming_events %}
+                <a href="/event/{{event.pk}}"><div> {{event.name}} - {{event.date}} </div></a>
             {% endfor %}
-            <div> <button class="bnt btn-primary filter-button">Select Calendars</button></div>
+            <div class="subtitle">Recent Events:</div>
+            {% for event in recent_events %}
+                <a href="/event/{{event.pk}}"><div> {{event.name}} - {{event.date}} </div></a>
+            {% endfor %}
+        </div>
+        <div class="header-column">
+            <div class="subtitle">Active Calendars:</div>
+            {% for filter in filters %}
+            <label data-id="{{filter.id}}" class="filter-container">{{filter.name}}
+                <input type="checkbox" {% if filter.pk in filter_params or no_params %} checked="checked" {% endif %}>
+                <span class="checkmark"></span>
+              </label><br>
+            {% endfor %}
+            <div> <button class="bnt btn-primary filter-button">Select</button></div>
         </div>
         
         
@@ -73,7 +91,11 @@
             margin-bottom: 45px;
             width: 100%;
             display: flex;
-            justify-content: space-evenly;
+            justify-content: flex-start;
+        }
+
+        .header-column {
+            margin-left: 100px;
         }
 
         .calendar-body {
@@ -93,10 +115,6 @@
         }
         .calendar-time {
             text-align: center;
-        }
-
-        .calendar-title {
-            width: 100%;
         }
 
         .calendar-subtitle-bar {

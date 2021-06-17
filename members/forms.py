@@ -6,7 +6,6 @@ from .models import Member
 from .models import MemberUser
 from .models import UserRole
 from .models import Permissions
-from .models import UserToMember
 
 class ApplicationForm(forms.Form):
     name = forms.CharField(label='Your Name', max_length=255, error_messages={'required': 'Please enter your name'})

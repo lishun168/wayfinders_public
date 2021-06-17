@@ -38,8 +38,6 @@ class MemberUser(models.Model):
     job_title = models.CharField(max_length=255, null=True, blank=True)
     is_forum_mod = models.BooleanField(default=False)
     is_wf_admin = models.BooleanField(default=False)
-
-    
     address = models.CharField(max_length=255, null=True, blank=True)
     address_2 = models.CharField(max_length=255, null=True, blank=True)
     city = models.CharField(max_length=255, null=True, blank=True)
@@ -82,6 +80,7 @@ class Permissions(models.Model):
     can_add_employees = models.BooleanField(default=False)
     can_delete_posts = models.BooleanField(default=False)
     can_edit_own_profile = models.BooleanField(default=True)
+    can_add_skills = models.BooleanField(default=False)
     member = models.ForeignKey(Member, on_delete=models.CASCADE)
 
     def __str__(self):

@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.utils.safestring import mark_safe
 from datetime import datetime
 from django.views import View
+from django.utils import timezone
 from datetime import date
 from calendar import HTMLCalendar
 from itertools import groupby
@@ -90,17 +91,26 @@ def get_calendar_context(calendar, filter, filter_params, date):
             "6 PM", "7 PM", "8 PM", "9 PM", "10 PM", "11 PM"
         ]
 
+    upcoming_events = Event.objects.filter(calendar=calendar, date__gt=timezone.now()).order_by('-date')[:4]
+    recent_events = Event.objects.filter(calendar=calendar, date__lt=timezone.now()).order_by('date')[:2]
+
+
     context = {
             'calendar': calendar,
             'times': times,
             'filters': filter,
-            'date_object': date
+            'date_object': date,
+            'filter_params': filter_params,
+            'upcoming_events': upcoming_events,
+            'recent_events': recent_events
     }  
 
+   
     if filter_params == []:
         events = Event.objects.filter(date__year=date.year, date__month=date.month, calendar=calendar)
         html_c = EventCalendar(events, calendar).formatmonth(date.year, date.month)
         context['html_calendar'] = mark_safe(html_c)
+        context['no_params'] = True
     else:
         for i in range(0, len(filter_params)):
             filter_params[i] = int(filter_params[i])
@@ -108,7 +118,18 @@ def get_calendar_context(calendar, filter, filter_params, date):
         logger.error(events)
         html_c = EventCalendar(events, calendar).formatmonth(date.year, date.month)
         context['html_calendar'] = mark_safe(html_c)
-    
+        context['no_params'] = False
+
+    if calendar.user == None:
+        context['member_calendar'] = True
+        context['user_calendar'] = False
+    elif calendar.member == None:
+        context['user_calendar'] = True
+        context['member_calendar'] = False
+    else:
+        context['user_calendar'] = False
+        context['member_calendar'] = False
+
     return context
 
 class Calendar(LoginPermissionMixin, View):
@@ -145,7 +166,7 @@ class CreateFilter(LoginPermissionMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super(CreateFilter, self).get_context_data(**kwargs)
-        context['button_text'] = 'Create Sub Calendar'
+        context['button_text'] = 'Create Calendar'
         return context
 
     def dispatch(self, *args, **kwargs):

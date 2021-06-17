@@ -19,16 +19,16 @@ class MemberToSkills(models.Model):
         return '%s: %s' % (self.member, self.skill)
 
     class Meta:
-        verbose_name="Member Skills"
-        verbose_name_plural="Member Skills"
+        verbose_name="Member Skill Relationship"
+        verbose_name_plural="Member Skill Relationships"
 
 class UserToSkills(models.Model):
     user = models.ForeignKey(MemberUser, on_delete=models.CASCADE)
     skill = models.ForeignKey(Skill, on_delete=models.CASCADE)
 
     def __str__(self):
-        return '%s: %s' % (self.member_user, self.skill)
+        return '%s: %s' % (self.user, self.skill)
 
     class Meta:
-        verbose_name="User Skills"
-        verbose_name_plural="User Skills"
+        verbose_name="User Skill Relationship"
+        verbose_name_plural="User Skill Relationships"

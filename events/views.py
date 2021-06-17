@@ -11,6 +11,8 @@ from cal.models import Calendar
 from .models import Invitation, Event, Participants, GuestParticipant
 from members.models import MemberUser
 from search.models import SearchObject, SearchTags
+from .forms import EventForm
+from .forms import EventUpdateForm
 
 import logging
 logger = logging.getLogger(__name__)
@@ -102,7 +104,7 @@ def join_view(request, event_pk, user_pk):
 class CreateEvent(LoginPermissionMixin, CreateView):
     template_name = 'create_edit_model.html'
     model = Event
-    fields = ('name', 'description', 'location', 'date', 'time', 'end_time', 'public', 'sub_calendar', 'is_open', 'open_editing')
+    form_class = EventForm
 
     def get_form(self):
         form = super(CreateEvent, self).get_form()
@@ -115,6 +117,11 @@ class CreateEvent(LoginPermissionMixin, CreateView):
         context = super(CreateEvent, self).get_context_data(**kwargs)
         context['button_text'] = 'Create Event'
         return context
+
+    def get_form_kwargs(self):
+        kwargs = super(CreateEvent, self).get_form_kwargs()
+        kwargs['pk'] = self.kwargs.get('pk')
+        return kwargs
 
     def dispatch(self, *args, **kwargs):
         return super(CreateEvent, self).dispatch(*args, **kwargs)
@@ -181,10 +188,10 @@ class CreateBooking(CreateView):
             new_obj.time.replace(hour = start_hour, minute = start_minute)
             new_obj.end_time = obj.end_time
             end_add_minutes = new_obj.end_time.minute + interval
-            logger.error(end_add_minutes)
+            
             end_add_hours = get_hours(0, end_add_minutes)
             end_minute = end_add_minutes - (end_add_hours * 60)
-            logger.error("i:" + str(interval) + "add:" + str(end_minute) + "h:" + str(end_add_hours))
+            
             end_hour = new_obj.end_time.hour + end_add_hours
             new_obj.end_time.replace(hour=end_hour, minute=end_minute)
             new_obj.allow_booking = True
@@ -279,8 +286,7 @@ class BookEvent(CreateView):
 class UpdateEvent(LoginPermissionMixin, UpdateView):
     template_name = 'create_edit_model.html'
     model = Event
-    fields = ('name', 'description', 'location', 'date', 'time', 'end_time', 'public', 
-        'sub_calendar', 'is_open')
+    form_class = EventUpdateForm
     success_url = "/"
 
     def get_form(self):
@@ -296,6 +302,11 @@ class UpdateEvent(LoginPermissionMixin, UpdateView):
         context['button_text'] = 'Update Event'
         return context
 
+    def get_form_kwargs(self):
+        kwargs = super(UpdateEvent, self).get_form_kwargs()
+        kwargs['pk'] = self.kwargs.get('pk')
+        return kwargs
+
     def dispatch(self, *args, **kwargs):
         return super(UpdateEvent, self).dispatch(*args, **kwargs)
 
@@ -308,22 +319,32 @@ class UpdateEvent(LoginPermissionMixin, UpdateView):
         return HttpResponseRedirect(success_url)
 
 class ViewEvent(LoginPermissionMixin, View):
-    template_name = 'cal/event.html'
+    template_name = 'events/event.html'
     
     def get(self, request, pk):
-        eve = Event.objects.get(pk=pk)
-        invitations = Invitation.objects.filter(events=eve)
-        participants = Participants.objects.filter(events=eve)
+        event = Event.objects.get(pk=pk)
+        invitations = Invitation.objects.filter(events=event)
+        participants = Participants.objects.filter(events=event)
         member = MemberUser.objects.get(user=request.user)
 
         context = {
-            'event': eve,
+            'event': event,
             'invitations': invitations,
             'participants': participants
         }
 
+        if event.calendar.user == None:
+            context['member_calendar'] = True
+            context['user_calendar'] = False
+        elif event.calendar.member == None:
+            context['user_calendar'] = True
+            context['member_calendar'] = False
+        else:
+            context['user_calendar'] = False
+            context['member_calendar'] = False
+
         try:
-            my_participation = Participants.objects.get(events=eve, member=member)
+            my_participation = Participants.objects.get(events=event, member=member)
             context.update({
                 'my_part': True,
                 'admin': my_participation.is_administrator

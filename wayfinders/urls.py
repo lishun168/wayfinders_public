@@ -46,9 +46,17 @@ from members.views import Approval
 from members.views import UpdatePassword
 from members.views import Application
 from members.views import ApplicationSubmission
+from skills.views import AddMemberSkill
 from skills.views import CreateSkill
+from skills.views import MemberSkill
 from skills.views import ViewSkill
 from skills.views import MySkills
+from skills.views import AddSkill
+from industries.views import ViewIndustry
+from industries.views import AddIndustry
+from industries.views import AddMemberIndustry
+from industries.views import MyIndustries
+from industries.views import MemberIndustries
 from groups.views import CreateGroup
 from groups.views import EditGroup
 from groups.views import LeaveGroup
@@ -155,6 +163,16 @@ urlpatterns = [
     path('create_skill/<int:pk>', CreateSkill.as_view()),
     path('my_skills/<int:pk>', MySkills.as_view()),
     path('skill/<int:pk>', ViewSkill.as_view()),
+    path('add_skill/<int:pk>', AddSkill.as_view()),
+    path('member_skills/<int:pk>', MemberSkill.as_view()),
+    path('add_member_skill/<int:pk>', AddMemberSkill.as_view()),
+
+    ## INDUSTRY APP ##
+    path('industry/<int:pk>', ViewIndustry.as_view()),
+    path('add_member_industry/<int:pk>', AddMemberIndustry.as_view()),
+    path('add_industry/<int:pk>', AddIndustry.as_view()),
+    path('member_industries/<int:pk>', MemberIndustries.as_view()),
+    path('my_industries/<int:pk>', MyIndustries.as_view()),
 
     ## SEARCH APP ##
     path('global_search/<str:query>', Search.as_view()),

@@ -8,15 +8,14 @@
     {% include 'members/base_profile.html' %}
     <div class="profile">
         <div class="profile_section">
-            <a href="/create_skill/{{profile.pk}}"><button>Add New Skill</button></a>
+            <a href="/add_skill/{{profile.pk}}"><button class="bnt btn-primary">Add Skill</button></a>
         </div>
-        {%for fk_proxy in member_skills %}
         <div class="profile_section">
-            <div>{{fk_proxy.skill.name}}</div>
-            <div>{{fk_proxy.skill.description}}</div>
-            
+            <div class="subtitle">Skills:</div>
+            {% for member_skill in member_skills %}
+                <div><a href="/skill/{{member_skill.skill.pk}}">{{member_skill.skill.name}}</a></div>
+            {% endfor %}
         </div>
-        {% endfor %}
     </div>
 </div>
 

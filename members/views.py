@@ -33,10 +33,13 @@ from .models import Permissions
 from .models import Application as ApplicationModel
 from skills.models import Skill
 from skills.models import MemberToSkills
+from skills.models import UserToSkills
 from cal.models import Calendar
+from cal.models import Filter
+from events.models import Event
 from events.models import Invitation
 from events.models import Participants
-from industries.models import MemberToIndustry
+from industries.models import MemberToIndustry, UsertoIndustry
 ##                              ##
 
 import logging
@@ -62,13 +65,20 @@ class UserProfile(LoginPermissionMixin, View):
     def get(self, request, pk):
         user = MemberUser.objects.get(pk=pk)
         calendar = Calendar.objects.get(user=user)
-        memberskills = MemberToSkills.objects.filter(member=pk)
+        filters = Filter.objects.filter(calendar__user=user)
+        user_skills = UserToSkills.objects.filter(user=user)
+        user_industries = UsertoIndustry.objects.filter(user=user)
         user_role = UserRole.objects.get(user=user)
+        member_of = UserToMember.objects.filter(member_user=user)
+
         context = {
             'profile': user,
-            'member_skills': memberskills,
+            'user_skills': user_skills,
+            'user_industries': user_industries,
             'user_role': user_role,
-            'calendar': calendar
+            'calendar': calendar,
+            'filters': filters,
+            'member_of': member_of
         }
 
         if request.user is not None:
@@ -263,14 +273,21 @@ class MemberView(View):
         member_skills = MemberToSkills.objects.filter(member=member)
         member_industries = MemberToIndustry.objects.filter(member=member)
         member_user_list = UserToMember.objects.filter(member=member)
+        calendar = Calendar.objects.get(member=member)
+        filters = Filter.objects.filter(calendar=calendar)
+        upcoming_events = Event.objects.filter(calendar=calendar, date__gt=timezone.now()).order_by('-date')[:5]
+        recent_events = Event.objects.filter(calendar=calendar, date__lt=timezone.now()).order_by('date')[:5]
 
-        logger.error(member_user_list)
 
         context = {
             'member': member,
             'member_skills': member_skills,
             'member_industries': member_industries,
-            'member_user_list': member_user_list
+            'member_user_list': member_user_list,
+            'filters': filters,
+            'calendar': calendar,
+            'upcoming_events': upcoming_events,
+            'recent_events': recent_events
         }
 
         if request.user.is_authenticated == True:
@@ -546,7 +563,6 @@ class Roles(View):
     def get(self, request, pk):
         permissions = Permissions.objects.filter(member__pk=pk)
 
-        logger.error(permissions.count())
         context = {
             'permissions': permissions
         }

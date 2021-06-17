@@ -3,13 +3,23 @@
 {% load static %}
 
 {% block content %}
+
 <div class="section">
-    <form method="post">{% csrf_token %}
-        {{form.name.label}}: {{form.name}} <br> <br>
-        <br>
-        <input type="submit" value="Create Calendar">
-    </form>
+    {% include 'members/base_profile.html' %}
+    <div class="profile">
+        <div class="profile_section">
+            <a href="/add_industry/{{profile.pk}}"><button class="bnt btn-primary">Add Industry</button></a>
+        </div>
+        <div class="profile_section">
+            <div class="subtitle">Skills:</div>
+            {% for user_industry in user_industries %}
+                <div><a href="/industry/{{user_industry.industry.pk}}">{{user_industry.industry.name}}</a></div>
+            {% endfor %}
+        </div>
+    </div>
 </div>
+
+
 {% endblock %}
 
 {% block head %}
@@ -23,14 +33,6 @@
     <link href="#" rel="icon" type="image/x-icon" />
 
     <style>
-
-        .section {
-            padding-top: 25px;
-            padding-bottom: 25px;
-            padding-left: 10%;
-            padding-right: 10%;
-            overflow: hidden;
-        }
 
         .subtitle {
             color:  #398677;
@@ -57,6 +59,10 @@
 
         .profile_section {
             margin-bottom: 25px;
+        }
+
+        .inline {
+            display:inline;
         }
 
     </style>

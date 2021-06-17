@@ -7,17 +7,35 @@
 
 <div class="event_details">
     <div class="title">
-        <div>{{event.name}}</div>
-        {% if my_part == True or event.open_editing == True %}
-            {% if admin == True or event.open_editing == True %}
-                <div class="inline"><a href="/edit_event/{{event.pk}}" > <img src="{%static 'members/img/edit.png' %}" height="15" width="15"> </a></div> 
+        <div class="subtitle_section">
+            <h3>{{event.name}}</h3>
+            {% if my_part == True or event.open_editing == True %}
+                {% if admin == True or event.open_editing == True %}
+                    <div class="edit_img"><a href="/edit_event/{{event.pk}}" > <img src="{%static 'members/img/edit.png' %}" height="29" width="29"> </a></div> 
+                {% endif %}
             {% endif %}
-        {% endif %}
+        </div>
     </div>   <br>
     <div>{{event.description}}</div><br>
     <div><b>At:</b> {{event.date}}</div><br>
     <div><b>Starts:</b> {{event.time}}</div><br>
     <div><b>Ends:</b> {{event.end_time}}</div><br>
+
+    <div class="events_details">
+        <div class="subtitle">Host:</div>
+            {% if member_calendar %}
+                <div> <a href="/member/{{event.calendar.member.pk}}">{{event.calendar.member.name}}</a></div>
+            {% elif user_calendar %}
+                <div> <a href="/profile/{{event.calendar.user.pk}}">{{event.calendar.user.first_name}} {{event.calendar.user.last_name}}</a></div>
+            {% else %}
+                <div> Public </div>
+            {% endif %}
+    </div>
+
+    <div class="events_details">
+        <div class="subtitle">Calendar:</div>
+        <div><a href="/calendar/{{event.calendar.pk}}"> {{event.calendar.name}} </a></div>
+    </div>
 
     <div class="events_details">
         <div class="subtitle">Invitations:</div>
