@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='userrole',
             name='member',
-            field=models.ForeignKey(default=4, on_delete=django.db.models.deletion.CASCADE, to='members.member'),
+            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.CASCADE, to='members.member'),
             preserve_default=False,
         ),
     ]
