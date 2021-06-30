@@ -12,7 +12,15 @@
         </button>
         <div id="navbarNav" >
 
-                <div class="navbarNav-item"><a class="nav-link" href="/members">Admin</a></div>
+                {% if request.user.is_superuser %}
+                <div class="navbarNav-item dropbtn admin" onClick="adminDrop()"> Admin (Admin)</div>
+                <div id="admin-dropdown" class="dropdown-content dropdown-menu-right hide">
+                    <a href="/admin">Admin Site</a>
+                    <a href="/create_member_choice">Add Member</a>
+                    <a href="/upload_skills">Upload Skills</a>
+                    <a href="/upload_industries">Upload Industries</a>
+                </div>
+                {% endif %}
                 <div class="navbarNav-item"><a class="nav-link" href="/members">Members</a></div>
                 <div class="navbarNav-item"><a class="nav-link" href="/forum">Discussions</a></div>
                 {% if user.is_authenticated %}
@@ -27,7 +35,7 @@
                 </div>
                 {% else %}
                 <div class="navbarNav-item"><a class="nav-link" href="/login_page">Login</a></div>
-                <div class="navbarNav-item"><a class="nav-link" href="/application">Apply</a></div>
+                <div class="navbarNav-item"><a class="nav-link" href="/application_choice">Apply</a></div>
                 {% endif %}
         </div>
     </div>
@@ -87,7 +95,18 @@
     }
     
     #profile-dropdown {
+        position: absolute;
         margin-top: 255px;
+        z-index: 1;
+        background-color: #f1f1f1;
+        min-width: 160px;
+        overflow: auto;
+        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    }
+
+    #admin-dropdown {
+        margin-top: 255px;
+        right: 250;
         position: absolute;
         z-index: 1;
         background-color: #f1f1f1;
@@ -103,6 +122,10 @@
         display: block;
     }
 
+    .admin {
+        color: white;
+    }
+
     .dropdown a:hover {background-color: #ddd;}
 
     .hide {display: none;}
@@ -114,6 +137,10 @@
 toggle between hiding and showing the dropdown content */
 function profileDrop() {
   document.getElementById("profile-dropdown").classList.toggle("hide");
+}
+
+function adminDrop() {
+  document.getElementById("admin-dropdown").classList.toggle("hide");
 }
 
 </script>

@@ -8,6 +8,11 @@ from django.views.decorators import csrf
 from django.core.paginator import Paginator
 from login.views import LoginPermissionMixin
 from django.core.exceptions import PermissionDenied
+from wayfinders.functions import add_to_queryset
+import operator
+from django.contrib import messages
+from django.db.models import Q
+from .forms import SearchForm
 
 import logging
 logger = logging.getLogger(__name__)
@@ -16,12 +21,69 @@ class ForumDirectory(LoginPermissionMixin, View):
     template_name='forum/forum_directory.html'
 
     def get(self, request):
-        threads = Discussion.objects.all().order_by('-sticky', '-created_at')
+        form = SearchForm()
         context = {
-            'threads': threads
+            'form': form
         }
+        oldest = request.GET.get("oldest")
+        sticky = request.GET.get("sticky")
+        subject = request.GET.get("subject")
+        contains = request.GET.get("contains")
+        check_flags = request.GET.get("check_flags")
+        likes = request.GET.get("likes")
 
+        queryQ = Q()
+        if subject:
+            queryQ &= Q(title__icontains=subject) | Q(subtitle__icontains=subject)
+        if contains:
+            queryQ &= Q(post__body__icontains=contains) | Q(reply__body__contains=contains)
+               
+        threads = Discussion.objects.filter(queryQ)
+
+        if oldest == "true":
+            threads = sorted(threads, key=operator.attrgetter('created_at'))
+        else:
+            threads = sorted(threads, key=operator.attrgetter('created_at'), reverse=True)
+
+        if likes == "true":
+            threads = sorted(threads, key=operator.attrgetter('likes'), reverse=True)
+        if sticky != "false":
+            threads = sorted(threads, key=operator.attrgetter('sticky'), reverse=True)
+        if check_flags == "true":
+            threads = sorted(threads, key=operator.attrgetter('number_of_flags'), reverse=True)
+            context['check_flags'] = True
+
+        context['threads'] = threads
+    
         return render(request, self.template_name, context)
+
+    def post(self, request, *args, **kwargs):
+        form = SearchForm(request.POST)
+        if form.is_valid():
+            subject = form.cleaned_data['subject']
+            contains = form.cleaned_data['contains']
+            likes = form.cleaned_data['likes']
+            sticky = form.cleaned_data['sticky']
+
+            logger.error("valid")
+            logger.error(form)
+
+            search_url = "/forum?"
+            if subject:
+                search_url += "subject=" + subject + "&"
+            if contains:
+                search_url += "contains=" + contains + "&"
+            if likes:
+                search_url += "likes=" + str(likes).lower() + "&"
+
+            search_url += "sticky=" + str(sticky).lower() + "&"
+
+            return HttpResponseRedirect(search_url)
+                
+        
+        messages.add_message(request, messages.ERROR, "Search failed. Invalid Search")
+        search_url = "/forum"
+        return HttpResponseRedirect(search_url)
 
 class ThreadPage(LoginPermissionMixin, View):
     template_name='forum/discussion.html'
@@ -36,13 +98,16 @@ class ThreadPage(LoginPermissionMixin, View):
         like_or_flag_posts = MemberLikeOrFlagPost.objects.filter(member=user_member, post__discussion=thread)
         like_or_flag_replies = MemberLikeOrFlagReply.objects.filter(member=user_member, reply__discussion=thread)
 
+        forum_admin = self.request.user.is_superuser or user_member.is_wf_admin or user_member.is_forum_mod
+
         context = {
             'thread': thread,
             'posts': posts,
             'replies': replies,
             'user': user_member,
             'like_or_flag_posts': like_or_flag_posts,
-            'like_or_flag_replies': like_or_flag_replies
+            'like_or_flag_replies': like_or_flag_replies,
+            'forum_admin': forum_admin
         }
 
         return render(request, self.template_name, context)

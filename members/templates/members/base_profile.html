@@ -9,13 +9,13 @@
             </div>
             <div class="inline charm-bar">
                 {% if my_profile or admin %}
-                <div><a href="/edit_profile/{{profile.pk}}" > <img src="{%static 'members/img/edit.png' %}" height="30" width="30"> </a></div>
+                <div><a href="/edit_profile/{{profile.pk}}" > <img src="{%static 'members/img/edit.png' %}" height="30" width="30"> EDIT PROFILE </a></div>
                 {% endif %}
                 {% if my_profile or admin or calendar.public %}
-                <div><a href="/calendar/{{calendar.pk}}"><img src="{%static 'members/img/calendar.png' %}" height="30" width="30"></a></div>
+                <div><a href="/calendar/{{calendar.pk}}"><img src="{%static 'members/img/calendar.png' %}" height="30" width="30"> MY CALENDAR </a></div>
                 {% endif %}
                 {% if my_profile or admin %}
-                <div><a href="/invites/{{profile.pk}}" > <img src="{%static 'members/img/invite.png' %}" height="30" width="30"> </a></div>
+                <div><a href="/invites/{{profile.pk}}" > <img src="{%static 'members/img/invite.png' %}" height="30" width="30"> MY EVENT INVITES</a></div>
                 {% endif %}
             </div>
         </div>

@@ -1,4 +1,4 @@
 from django import forms
 
-class SkillUploadForm(forms.Form):
+class IndustryUploadForm(forms.Form):
     file = forms.FileField()

@@ -198,6 +198,19 @@ class CreateUser(CreateView):
         success_url = "/pending_approval"
         return HttpResponseRedirect(success_url)
 
+class CreateMemberChoice(View):
+    
+    def get(self, request):
+        template_name = 'members/create_members.html'
+        members = Member.objects.all()
+
+        context = {
+            'members': members
+        }
+
+        return render(request, template_name, context)
+
+
 class CreateMemberProfile(CreateView):
     template_name = 'create_edit_model.html'
     model = MemberUser
@@ -752,5 +765,10 @@ class ApplicationSubmission(View):
     def get(self, request):
         return render(request, self.template_name, {})
 
+class ApplicationChoice(View):
+    template_name = 'members/application_choice.html'
+
+    def get(self, request):
+        return render(request, self.template_name)
 
 

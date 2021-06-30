@@ -5,6 +5,9 @@ from django.http import HttpResponseRedirect
 from django.views import View
 from django.views.generic.edit import UpdateView
 from django.views.generic.edit import CreateView
+from django.contrib import messages
+
+from .forms import SkillUploadForm
 
 from members.models import MemberUser
 from members.models import Member
@@ -13,7 +16,8 @@ from members.models import UserRole
 from .models import MemberToSkills
 from .models import UserToSkills
 from .models import Skill
-
+import csv
+import io
 # Create your views here.
 
 import logging
@@ -175,4 +179,33 @@ class MemberSkill(LoginPermissionMixin, View):
         }
 
         return render(request, self.template_name, context)
+
+class UploadSkills(LoginPermissionMixin, View):
+    template_name = 'skills/upload_skills.html'
+
+    def get(self, request):
+        form = SkillUploadForm()
+
+        context = {
+            'form': form
+        }
+
+        return render(request, self.template_name, context)
+
+    def post(self, request, *args, **kwargs):
+        form = SkillUploadForm(request.POST, request.FILES)
+
+        if form.is_valid():
+            csv_file = request.FILES['file']
+            decoded_file = csv_file.read().decode('utf-8')
+            io_string = io.StringIO(decoded_file)
+
+            for line in csv.reader(io_string, delimiter=","):
+                skill = Skill()
+                skill.name = line[0]
+                skill.description = line[1]
+                skill.save()
+
+        messages.add_message(request, messages.SUCCESS, "Your file has been uploaded successfully")
+        return HttpResponseRedirect('/upload_skills')
     

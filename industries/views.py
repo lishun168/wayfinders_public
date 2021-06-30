@@ -5,6 +5,11 @@ from django.http import HttpResponseRedirect
 from django.views import View
 from django.views.generic.edit import UpdateView
 from django.views.generic.edit import CreateView
+from django.contrib import messages
+import csv
+import io
+
+from .forms import IndustryUploadForm
 
 from .models import Industry
 from .models import MemberToIndustry
@@ -137,4 +142,32 @@ class MemberIndustries(LoginPermissionMixin, View):
 
         return render(request, self.template_name, context)
     
+class UploadIndustries(LoginPermissionMixin, View):
+    template_name = 'industries/upload_industries.html'
+
+    def get(self, request):
+        form = IndustryUploadForm()
+
+        context = {
+            'form': form
+        }
+
+        return render(request, self.template_name, context)
+
+    def post(self, request, *args, **kwargs):
+        form = IndustryUploadForm(request.POST, request.FILES)
+
+        if form.is_valid():
+            csv_file = request.FILES['file']
+            decoded_file = csv_file.read().decode('utf-8')
+            io_string = io.StringIO(decoded_file)
+
+            for line in csv.reader(io_string, delimiter=","):
+                industry = Industry()
+                industry.name = line[0]
+                industry.description = line[1]
+                industry.save()
+
+        messages.add_message(request, messages.SUCCESS, "Your file has been uploaded successfully")
+        return HttpResponseRedirect('/upload_industries')
 

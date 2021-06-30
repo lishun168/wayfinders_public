@@ -10,6 +10,8 @@ class Discussion(models.Model):
     created_by = models.ForeignKey(MemberUser, on_delete=models.SET_NULL, null=True, blank=True)
     created_by_string = models.CharField(max_length=255)
     sticky = models.BooleanField(default=False)
+    likes = models.IntegerField(default=0)
+    number_of_flags = models.IntegerField(default=0)
 
     def __str__(self):
         return '%s' % (self.title)
@@ -31,7 +33,7 @@ class Post(models.Model):
     number_of_flags = models.IntegerField(default=0)
 
     def __str__(self):
-        return '%s - %s' % (self.thread, self.created_at )
+        return '%s - %s' % (self.discussion, self.created_at )
 
 class Reply(models.Model):
     discussion = models.ForeignKey(Discussion, on_delete=models.CASCADE)
@@ -47,7 +49,7 @@ class Reply(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
 
     def __str__(self):
-        return '%s - %s' % (self.thread, self.created_at )
+        return '%s - %s' % (self.discussion, self.created_at )
 
     class Meta:
         verbose_name='Reply'

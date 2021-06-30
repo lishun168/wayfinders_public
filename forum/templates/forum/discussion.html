@@ -11,10 +11,10 @@
             </h1>
         </div>
         
-        {% if user == thread.created_by %}
+        {% if user == thread.created_by or forum_admin %}
             <div><a href="/forum/update/{{thread.pk}}">EDIT</a></div>
         {% endif %}
-        {% if user.is_forum_mod == True %}
+        {% if forum_admin %}
             <a href="/sticky/{{thread.pk}}">
             {% if thread.sticky == False %}
                 <img src="{%static 'members/img/sticky_empty.png' %}" width="30" height="30" style="object-fit: contain; object-position: left top; margin-top: 0px;">
@@ -41,7 +41,7 @@
                     <div class="post_sub_footer">
                         <div class="post_created_by">{{post.created_by}}</div>
                         <div> {{post.created_at}} </div> 
-                        {% if user == post.created_by %}
+                        {% if user == post.created_by or forum_admin %}
                             <div>
                                 <a href="/forum/post/update/{{post.pk}}">EDIT</a>
                             </div>
@@ -70,7 +70,7 @@
                                 <div class="post_sub_footer">
                                     <div class="post_created_by">{{reply.created_by}}</div>
                                     <div> {{reply.created_at}} </div> 
-                                    {% if user == post.created_by %}
+                                    {% if user == post.created_by or forum_admin %}
                                         <div>
                                             <a href="/forum/reply/update/{{reply.pk}}">EDIT</a>
                                         </div>

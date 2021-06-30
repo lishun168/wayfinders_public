@@ -22,7 +22,9 @@ from login.views import LoginPage
 from login import views as login_views
 from events import views as event_views
 from forum import views as forums_views
-from members.views import CreateMemberProfile, UpdatePassword
+from members.views import CreateMemberProfile
+from members.views import UpdatePassword
+from members.views import CreateMemberChoice
 from members.views import Index
 from members.views import UserProfile 
 from members.views import MemberView
@@ -46,17 +48,20 @@ from members.views import Approval
 from members.views import UpdatePassword
 from members.views import Application
 from members.views import ApplicationSubmission
+from members.views import ApplicationChoice
 from skills.views import AddMemberSkill
 from skills.views import CreateSkill
 from skills.views import MemberSkill
 from skills.views import ViewSkill
 from skills.views import MySkills
 from skills.views import AddSkill
+from skills.views import UploadSkills
 from industries.views import ViewIndustry
 from industries.views import AddIndustry
 from industries.views import AddMemberIndustry
 from industries.views import MyIndustries
 from industries.views import MemberIndustries
+from industries.views import UploadIndustries
 from groups.views import CreateGroup
 from groups.views import EditGroup
 from groups.views import LeaveGroup
@@ -98,6 +103,7 @@ urlpatterns = [
     path('member/<int:pk>', MemberView.as_view()),
     path('pending_approval', Approval.as_view()),
     path('create_profile/', CreateMemberProfile.as_view()),
+    path('create_member_choice/', CreateMemberChoice.as_view()),
     path('edit_member/<int:pk>', EditMember.as_view()),
     path('edit_member_list/<int:pk>', EditMembersList.as_view()),
 
@@ -113,6 +119,7 @@ urlpatterns = [
 
     path('application/', Application.as_view()),
     path('submission/', ApplicationSubmission.as_view()),
+    path('application_choice/', ApplicationChoice.as_view()),
 
     ## LOGIN APP ##
     path('login_page', LoginPage.as_view()),
@@ -166,6 +173,7 @@ urlpatterns = [
     path('add_skill/<int:pk>', AddSkill.as_view()),
     path('member_skills/<int:pk>', MemberSkill.as_view()),
     path('add_member_skill/<int:pk>', AddMemberSkill.as_view()),
+    path('upload_skills/', UploadSkills.as_view()),
 
     ## INDUSTRY APP ##
     path('industry/<int:pk>', ViewIndustry.as_view()),
@@ -173,6 +181,7 @@ urlpatterns = [
     path('add_industry/<int:pk>', AddIndustry.as_view()),
     path('member_industries/<int:pk>', MemberIndustries.as_view()),
     path('my_industries/<int:pk>', MyIndustries.as_view()),
+    path('upload_industries/', UploadIndustries.as_view()),
 
     ## SEARCH APP ##
     path('global_search/<str:query>', Search.as_view()),

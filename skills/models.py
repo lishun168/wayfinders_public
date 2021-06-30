@@ -32,3 +32,4 @@ class UserToSkills(models.Model):
     class Meta:
         verbose_name="User Skill Relationship"
         verbose_name_plural="User Skill Relationships"
+        

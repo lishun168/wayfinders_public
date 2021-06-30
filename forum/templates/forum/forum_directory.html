@@ -6,14 +6,32 @@
 <div class="body-content">
     <h1>Wayfinders Discussions</h1>
     {% if user.is_authenticated %}
-    <a href="/forum/create"><button type="button" class="btn btn-primary post-button">Create Discussion</button></a>
+        <a href="/forum/create"><button type="button" class="btn btn-primary post-button">Create Discussion</button></a>
     {% endif %}
+    {% if request.user.is_superuser %}
+        <a href="/forum?check_flags=true"><button type="button" class="btn btn-primary post-button">Check Flags (Admin)</button></a>
+    {% endif %}
+
+    <div>
+        <form class="m_form" method="post" enctype="multipart/form-data">{% csrf_token %}
+             <table>
+            {{form}}
+            </table>
+                <input class="btn btn-primary m_form_button" type="submit" value="Search">
+            </form>
+    <div>
 
     {% for thread in threads %}
         <a href="/forum/{{thread.pk}}"> 
             <div class="thread">
                 <div class="top-line">
-                    <div class="thread_title"> {{thread.title }}</div>
+                    <div class="thread_title"> {{thread.title }} 
+                        {% if check_flags %}
+                            <div class="number_of_flags">
+                                Flags: {{thread.number_of_flags}}
+                            </div>
+                        {% endif %}
+                    </div>
                     <div>
                         {% if thread.sticky == True %}
                         <img src="{%static 'members/img/sticky_full.png' %}" width="20" height="20" style="object-fit: contain; object-position: left top; margin-top: 0px;">
@@ -69,15 +87,10 @@
             padding-bottom: 50px;
         }
 
+        .number_of_flags {
+            color: red;
+        }
+
     </style>
-    <script>
-        $(document).ready( function() {
-            $("#search-button").click( function(event) {
-                var str = $('#search_query').val();
-                var search_url = "http://127.0.0.1:8000/search/" + str;
-                window.location.replace(search_url);
-            });
-        });
-    </script>
 
 {% endblock %}

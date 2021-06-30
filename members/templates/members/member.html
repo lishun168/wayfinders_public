@@ -27,19 +27,19 @@
             <div class="inline charm-bar">
                 {% if member.logo.url != None %}
                 <img src="{{member.logo.url}}" width="60" height="60" style="object-fit: contain; object-position: left top;">
-                <div class="inline"><a href="/calendar/{{calendar.pk}}" > <img src="{%static 'members/img/calendar.png' %}" height="30" width="30"> </a></div>
+                <div class="inline"><a href="/calendar/{{calendar.pk}}" > <img src="{%static 'members/img/calendar.png' %}" height="30" width="30"> CALENDAR</a> </div>
                 {% endif %}
                 {% if member_admin or is_owner %}
-                <div class="inline"><a href="/edit_member/{{member.pk}}" > <img src="{%static 'members/img/edit.png' %}" height="30" width="30"> </a></div>
+                <div class="inline"><a href="/edit_member/{{member.pk}}" > <img src="{%static 'members/img/edit.png' %}" height="30" width="30"> EDIT PROFILE</a></div>
                 {% endif %}
                 {% if is_owner or member_admin %}
-                <div class="inline"><a href="/signup/{{member.pk}}" > <img src="{%static 'members/img/plus.png' %}" height="30" width="30"> </a></div>
+                <div class="inline"><a href="/signup/{{member.pk}}" > <img src="{%static 'members/img/plus.png' %}" height="30" width="30"> ADD MEMBER</a></div>
                 {% endif %}
                 {% if is_owner or member_admin%}
-                <div class="inline"><a href="/permissions/{{member.pk}}" > <img src="{%static 'members/img/permissions.png' %}" height="30" width="30"> </a></div>
+                <div class="inline"><a href="/permissions/{{member.pk}}" > <img src="{%static 'members/img/permissions.png' %}" height="30" width="30"> ADD PERMISSIONS</a></div>
                 {% endif %}
                 {% if is_owner or member_admin%}
-                <div class="inline"><a href="/roles/{{member.pk}}" > <img src="{%static 'members/img/account_management.png' %}" height="30" width="30"> </a></div>
+                <div class="inline"><a href="/roles/{{member.pk}}" > <img src="{%static 'members/img/account_management.png' %}" height="30" width="30"> ASSIGN ROLES</a></div>
                 {% endif %}
             </div>
         </div>
