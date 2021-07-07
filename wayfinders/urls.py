@@ -17,6 +17,12 @@ from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.contrib.staticfiles.urls import static
 from rest_framework import routers
+
+from cal.api import CalendarAPI, FilterAPI
+from events.api import EventAPI, InvitationAPI, ParticipantsAPI, GuestParticipantAPI
+from forum.api import DiscussionAPI, PostAPI, ReplyAPI, MemberLikeOrFlagPostAPI, MemberLikeOrFlagReplyAPI
+from groups.api import GroupsAPI, RulesAPI, GroupToMemberAPI
+from search.api import SearchObjectAPI, SearchTagsAPI
 from . import settings
 from django.urls import path
 from django.urls import include
@@ -28,7 +34,7 @@ from members.views import CreateMemberProfile
 from members.views import UpdatePassword
 from members.views import CreateMemberChoice
 from members.views import Index
-from members.views import UserProfile 
+from members.views import UserProfile
 from members.views import MemberView
 from members.views import EditMember
 from members.views import EditMembersList
@@ -91,9 +97,34 @@ from events.views import MarkBusy
 from search.views import Search
 
 from members.api import MemberAPI
+from members.api import UserToMemberAPI
+from members.api import PermissionsAPI
+from members.api import UserRoleAPI
+from members.api import GalleryAPI
+from members.api import ApplicationAPI
 from members.api import MemberUserAPI
 from skills.api import SkillAPI
+from skills.api import MemberToSkillsAPI
+from skills.api import UserToSkillsAPI
 from industries.api import IndustryAPI
+from industries.api import MemberToIndustryAPI
+from industries.api import UsertoIndustryAPI
+from search.api import SearchObjectAPI
+from search.api import SearchTagsAPI
+from groups.api import GroupsAPI
+from groups.api import RulesAPI
+from groups.api import GroupToMemberAPI
+from forum.api import DiscussionAPI
+from forum.api import PostAPI
+from forum.api import ReplyAPI
+from forum.api import MemberLikeOrFlagPostAPI
+from forum.api import MemberLikeOrFlagReplyAPI
+from events.api import EventAPI
+from events.api import InvitationAPI
+from events.api import ParticipantsAPI
+from events.api import GuestParticipantAPI
+from cal.api import CalendarAPI
+from cal.api import FilterAPI
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -105,7 +136,7 @@ urlpatterns = [
     path('edit_profile/<int:pk>', EditUser.as_view()),
     path('create_member/', CreateUser.as_view()),
     path('change_password/', UpdatePassword.as_view()),
-    
+
     path('members/', MembersDirectory.as_view()),
     path('member/<int:pk>', MemberView.as_view()),
     path('pending_approval', Approval.as_view()),
@@ -122,7 +153,7 @@ urlpatterns = [
     path('create_role/<int:member_pk>', AssignRoles.as_view()),
     path('edit_role/<int:pk>/<int:member_pk>/', UpdateRoles.as_view()),
     path('edit_all_roles/<int:pk>/', RolesEditAll.as_view()),
-    #Update Many    
+    # Update Many
 
     path('application/', Application.as_view()),
     path('submission/', ApplicationSubmission.as_view()),
@@ -160,13 +191,13 @@ urlpatterns = [
     path('mark_busy/<int:pk>', MarkBusy.as_view()),
     path('book_event/<int:pk>/<int:cal_pk>', BookEvent.as_view()),
     path('event/<int:pk>', ViewEvent.as_view()),
-    path('invite/<int:pk>', CreateInvitation.as_view()), 
+    path('invite/<int:pk>', CreateInvitation.as_view()),
     path('accept_invite/<int:invite_pk>', event_views.accept_view),
     path('decline_invite/<int:invite_pk>', event_views.decline_view),
     path('join_event/<int:event_pk>/<int:user_pk>', event_views.join_view),
     path('invites/<int:pk>', Invites.as_view()),
     path('get_invite/<int:pk>', Invite.as_view()),
-    
+
     ## GROUP APP 
     path('create_group/<int:pk>', CreateGroup.as_view()),
     path('edit_group/<int:pk>', EditGroup.as_view()),
@@ -195,12 +226,45 @@ urlpatterns = [
     path('search/<str:query>', DirectorySearch.as_view()),
 ]
 
- ## API ##
+## API ##
 router = routers.DefaultRouter()
+# From Member application(7)
 router.register('api/members', MemberAPI, 'api/members')
 router.register('api/member_users', MemberUserAPI, 'api/member_users')
+router.register('api/users_members', UserToMemberAPI, 'api/users_members')
+router.register('api/permissions', PermissionsAPI, 'api/permissions')
+router.register('api/user_role', UserRoleAPI, 'api/member_users')
+router.register('api/gallery', GalleryAPI, 'api/gallery')
+router.register('api/application', ApplicationAPI, 'api/application')
+# From Skills application(3)
 router.register('api/skills', SkillAPI, 'api/skills')
+router.register('api/member_skills', MemberToSkillsAPI, 'api/member_skills')
+router.register('api/user_skills', UserToSkillsAPI, 'user_skills')
+# From Search application(2)
+router.register('api/search_object', SearchObjectAPI, 'api/search_object')
+router.register('api/search_tags', SearchTagsAPI, 'api/search_tags')
+# From Industries application(3)
 router.register('api/industry', IndustryAPI, 'api/industry')
+router.register('api/member_industry', MemberToIndustryAPI, 'api/member_industry')
+router.register('api/user_industry', UsertoIndustryAPI, 'api/user_industry')
+# From Groups application(3)
+router.register('api/groups', GroupsAPI, 'api/groups')
+router.register('api/rules', RulesAPI, 'api/rules')
+router.register('api/group_member', GroupToMemberAPI, 'api/group_member')
+# From Forum application(5)
+router.register('api/discussion', DiscussionAPI, 'api/discussion')
+router.register('api/post', PostAPI, 'api/post')
+router.register('api/reply', ReplyAPI, 'api/reply')
+router.register('api/member_like_or_flag_post', MemberLikeOrFlagPostAPI, 'api/member_like_or_flag_post')
+router.register('api/member_like_or_flag_reply', MemberLikeOrFlagReplyAPI, 'api/member_like_or_flag_reply')
+# From Event application(4)
+router.register('api/event', EventAPI, 'api/event')
+router.register('api/invitation', InvitationAPI, 'api/invitation')
+router.register('api/participants', ParticipantsAPI, 'api/participants')
+router.register('api/guest_participant', GuestParticipantAPI, 'api/guest_participant')
+# From Cal application(8)
+router.register('api/calendar', CalendarAPI, 'api/calendar')
+router.register('api/filter', FilterAPI, 'api/filter')
 
 urlpatterns += router.urls
 urlpatterns += staticfiles_urlpatterns()
