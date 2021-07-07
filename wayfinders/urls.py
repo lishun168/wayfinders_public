@@ -16,8 +16,10 @@ Including another URLconf
 from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.contrib.staticfiles.urls import static
+from rest_framework import routers
 from . import settings
-from django.urls import path, include
+from django.urls import path
+from django.urls import include
 from login.views import LoginPage
 from login import views as login_views
 from events import views as event_views
@@ -87,6 +89,11 @@ from events.views import CreateBooking
 from events.views import BookEvent
 from events.views import MarkBusy
 from search.views import Search
+
+from members.api import MemberAPI
+from members.api import MemberUserAPI
+from skills.api import SkillAPI
+from industries.api import IndustryAPI
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -186,8 +193,15 @@ urlpatterns = [
     ## SEARCH APP ##
     path('global_search/<str:query>', Search.as_view()),
     path('search/<str:query>', DirectorySearch.as_view()),
-
 ]
 
+ ## API ##
+router = routers.DefaultRouter()
+router.register('api/members', MemberAPI, 'api/members')
+router.register('api/member_users', MemberUserAPI, 'api/member_users')
+router.register('api/skills', SkillAPI, 'api/skills')
+router.register('api/industry', IndustryAPI, 'api/industry')
+
+urlpatterns += router.urls
 urlpatterns += staticfiles_urlpatterns()
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

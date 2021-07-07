@@ -47,6 +47,8 @@ INSTALLED_APPS = [
     'skills',
     'login',
     'industries',
+    'rest_framework',
+    'knox'
     
 ]
 
